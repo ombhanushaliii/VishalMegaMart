@@ -133,7 +133,7 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
 
       {/* Mobile Navigation */}
       <div className="lg:hidden border-t border-[#21262D] bg-[#0D1117]">
-        <div className="flex justify-between px-4 py-2">
+        <div className="flex flex-wrap justify-between px-4 py-2">
           {navigationItems.slice(0, 4).map((item) => (
             <Button
               key={item.value}

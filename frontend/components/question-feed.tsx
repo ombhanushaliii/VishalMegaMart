@@ -116,26 +116,26 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
   const filteredQuestions = getFilteredQuestions()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 px-2 sm:px-4 lg:px-0">
       {/* Filter Tabs */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-[#C9D1D9]">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <h2 className="text-lg sm:text-xl font-semibold text-[#C9D1D9]">
           {activeFilter === "most-answered"
             ? "Most Answered Questions"
             : activeFilter === "unanswered"
               ? "Unanswered Questions"
               : "Recent Questions"}
         </h2>
-        <div className="flex gap-1 bg-[#161B22] rounded-lg p-1 border border-[#21262D]">
+        <div className="flex gap-1 bg-[#161B22] rounded-lg p-1 border border-[#21262D] w-full sm:w-auto overflow-x-auto">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setActiveFilter("recent")}
-            className={
+            className={`${
               activeFilter === "recent"
                 ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-md"
                 : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md"
-            }
+            } text-xs sm:text-sm whitespace-nowrap flex-shrink-0`}
           >
             Recent
           </Button>
@@ -143,11 +143,11 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
             variant="ghost"
             size="sm"
             onClick={() => setActiveFilter("most-answered")}
-            className={
+            className={`${
               activeFilter === "most-answered"
                 ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-md"
                 : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md"
-            }
+            } text-xs sm:text-sm whitespace-nowrap flex-shrink-0`}
           >
             Most Answered
           </Button>
@@ -155,61 +155,61 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
             variant="ghost"
             size="sm"
             onClick={() => setActiveFilter("unanswered")}
-            className={
+            className={`${
               activeFilter === "unanswered"
                 ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-md"
                 : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md"
-            }
+            } text-xs sm:text-sm whitespace-nowrap flex-shrink-0`}
           >
             Unanswered
           </Button>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {filteredQuestions.map((question) => (
           <div
             key={question.id}
-            className="bg-[#161B22] rounded-xl border border-[#21262D] p-6 hover:border-[#30363D] transition-all duration-300 group cursor-pointer hover:shadow-lg hover:scale-[1.01]"
+            className="bg-[#161B22] rounded-xl border border-[#21262D] p-3 sm:p-4 md:p-6 hover:border-[#30363D] transition-all duration-300 group cursor-pointer hover:shadow-lg hover:scale-[1.01]"
             onClick={() => onQuestionSelect?.(question.id)}
           >
             {/* Question Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10 border-2 border-[#30363D] transition-all duration-300 group-hover:border-teal-400">
+            <div className="flex items-start justify-between mb-3 md:mb-4 gap-2">
+              <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-[#30363D] transition-all duration-300 group-hover:border-teal-400 flex-shrink-0">
                   <AvatarImage src={question.author.avatar || "/placeholder.svg"} alt={question.author.name} />
-                  <AvatarFallback className="bg-[#21262D] text-[#C9D1D9]">
+                  <AvatarFallback className="bg-[#21262D] text-[#C9D1D9] text-xs sm:text-sm">
                     {question.author.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <p className="font-medium text-[#C9D1D9]">{question.author.name}</p>
-                  <p className="text-sm text-[#7D8590]">Asked {question.timeAgo} • Development</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-[#C9D1D9] text-sm sm:text-base truncate">{question.author.name}</p>
+                  <p className="text-xs sm:text-sm text-[#7D8590] truncate">Asked {question.timeAgo} • Development</p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-[#7D8590] hover:text-teal-400 transition-all duration-200 hover:scale-105"
+                  className="text-[#7D8590] hover:text-teal-400 transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Heart className="h-4 w-4 mr-1" />
-                  Follow
+                  <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="hidden sm:inline">Follow</span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] transition-all duration-200 hover:scale-110"
+                      className="text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] transition-all duration-200 hover:scale-110 h-8 w-8 sm:h-9 sm:w-9"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <MoreHorizontal className="h-4 w-4" />
+                      <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -233,20 +233,20 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
             </div>
 
             {/* Question Content */}
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-[#C9D1D9] mb-2 group-hover:text-teal-400 transition-colors duration-300">
+            <div className="mb-3 md:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-[#C9D1D9] mb-2 group-hover:text-teal-400 transition-colors duration-300 line-clamp-2">
                 {question.title}
               </h3>
-              <p className="text-[#7D8590] leading-relaxed">{question.content}</p>
+              <p className="text-[#7D8590] leading-relaxed text-sm sm:text-base line-clamp-2 sm:line-clamp-3">{question.content}</p>
             </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 md:mb-4">
               {question.tags.map((tag) => (
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="bg-teal-500/10 text-teal-400 border border-teal-500/20 hover:bg-teal-500/20 cursor-pointer transition-all duration-200 hover:scale-105"
+                  className="bg-teal-500/10 text-teal-400 border border-teal-500/20 hover:bg-teal-500/20 cursor-pointer transition-all duration-200 hover:scale-105 text-xs px-2 py-1"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {tag}
@@ -255,8 +255,8 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
             </div>
 
             {/* Actions and Stats */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
                 {/* Voting */}
                 <div className="flex items-center space-x-1">
                   <Button
@@ -265,9 +265,9 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
                     className="text-[#7D8590] hover:text-green-400 hover:bg-green-500/10 p-1 transition-all duration-200 hover:scale-110"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <ArrowUp className="h-4 w-4" />
+                    <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
-                  <span className="text-sm font-medium text-[#C9D1D9] min-w-[2rem] text-center">
+                  <span className="text-xs sm:text-sm font-medium text-[#C9D1D9] min-w-[1.5rem] sm:min-w-[2rem] text-center">
                     {question.stats.votes}
                   </span>
                   <Button
@@ -276,14 +276,14 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
                     className="text-[#7D8590] hover:text-red-400 hover:bg-red-500/10 p-1 transition-all duration-200 hover:scale-110"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <ArrowDown className="h-4 w-4" />
+                    <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center space-x-4 text-sm text-[#7D8590]">
+                <div className="flex items-center space-x-3 sm:space-x-4 text-xs sm:text-sm text-[#7D8590]">
                   <div className="flex items-center space-x-1">
-                    <MessageSquare className="h-4 w-4" />
+                    <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>{question.stats.answers} answers</span>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
 
               {/* Answer Button */}
               <Button
-                className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-lg px-6 py-2 font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-lg px-4 sm:px-6 py-2 font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm w-full sm:w-auto"
                 onClick={(e) => e.stopPropagation()}
               >
                 Answer
@@ -302,39 +302,40 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center items-center space-x-2 pt-6 pb-8">
+      <div className="flex justify-center items-center space-x-1 sm:space-x-2 pt-4 sm:pt-6 pb-6 sm:pb-8 overflow-x-auto">
         <Button
           variant="outline"
           size="sm"
-          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] bg-transparent transition-all duration-200 hover:scale-105"
+          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] bg-transparent transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 flex-shrink-0"
         >
-          Previous
+          <span className="hidden sm:inline">Previous</span>
+          <span className="sm:hidden">Prev</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="border-[#30363D] bg-teal-500/20 text-teal-400 border-teal-500/30"
+          className="border-[#30363D] bg-teal-500/20 text-teal-400 border-teal-500/30 text-xs sm:text-sm px-2 sm:px-3 flex-shrink-0"
         >
           1
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] bg-transparent transition-all duration-200 hover:scale-105"
+          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] bg-transparent transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 flex-shrink-0"
         >
           2
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] bg-transparent transition-all duration-200 hover:scale-105"
+          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] bg-transparent transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 flex-shrink-0"
         >
           3
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] hover:text-teal-400 bg-transparent transition-all duration-200 hover:scale-105"
+          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] hover:text-teal-400 bg-transparent transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 flex-shrink-0"
         >
           Next
         </Button>
