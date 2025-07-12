@@ -74,7 +74,7 @@ interface Question {
   _id: string
   title: string
   description: string
-  userId: {
+  userId?: {
     username: string
     email: string
   }
@@ -86,12 +86,12 @@ interface Question {
 
 interface Report {
   _id: string
-  reportedBy: {
+  reportedBy?: {
     username: string
     email: string
   }
   contentType: string
-  contentId: {
+  contentId?: {
     _id: string
     title?: string // For questions
     description?: string // For questions
@@ -119,10 +119,12 @@ export function AdminPanel() {
   const [adminToken, setAdminToken] = useState<string | null>(null)
   const [loginForm, setLoginForm] = useState({ username: '', password: '' })
   const [stats, setStats] = useState<AdminStats | null>(null)
+  const [statsLoading, setStatsLoading] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [questions, setQuestions] = useState<Question[]>([])
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(false)
+  const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
   const [error, setError] = useState('')
   const [reportFilter, setReportFilter] = useState<'all' | 'pending' | 'resolved' | 'dismissed' | 'reviewed'>('all')
 
@@ -158,6 +160,7 @@ export function AdminPanel() {
 
   const fetchDashboardStats = async (token: string) => {
     try {
+      setStatsLoading(true)
       const response = await fetch(`${API_BASE_URL}/admin/dashboard/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -170,6 +173,8 @@ export function AdminPanel() {
       }
     } catch (error) {
       console.error('Error fetching stats:', error)
+    } finally {
+      setStatsLoading(false)
     }
   }
 
@@ -249,6 +254,7 @@ export function AdminPanel() {
     if (!adminToken) return
 
     try {
+      setActionLoading(prev => ({ ...prev, [`toggle-${questionId}`]: true }))
       const response = await fetch(`${API_BASE_URL}/admin/questions/${questionId}/toggle-status`, {
         method: 'PUT',
         headers: {
@@ -261,6 +267,8 @@ export function AdminPanel() {
       }
     } catch (error) {
       console.error('Error toggling question status:', error)
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`toggle-${questionId}`]: false }))
     }
   }
 
@@ -268,6 +276,7 @@ export function AdminPanel() {
     if (!adminToken) return
 
     try {
+      setActionLoading(prev => ({ ...prev, [`delete-${questionId}`]: true }))
       const response = await fetch(`${API_BASE_URL}/admin/questions/${questionId}`, {
         method: 'DELETE',
         headers: {
@@ -280,6 +289,8 @@ export function AdminPanel() {
       }
     } catch (error) {
       console.error('Error deleting question:', error)
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`delete-${questionId}`]: false }))
     }
   }
 
@@ -287,6 +298,7 @@ export function AdminPanel() {
     if (!adminToken) return
 
     try {
+      setActionLoading(prev => ({ ...prev, [`report-${reportId}`]: true }))
       const response = await fetch(`${API_BASE_URL}/admin/reports/${reportId}/status`, {
         method: 'PUT',
         headers: {
@@ -304,6 +316,8 @@ export function AdminPanel() {
       }
     } catch (error) {
       console.error('Error updating report status:', error)
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`report-${reportId}`]: false }))
     }
   }
 
@@ -311,6 +325,7 @@ export function AdminPanel() {
     if (!adminToken) return
 
     try {
+      setActionLoading(prev => ({ ...prev, [`delete-report-${reportId}`]: true }))
       const response = await fetch(`${API_BASE_URL}/admin/reports/${reportId}`, {
         method: 'DELETE',
         headers: {
@@ -326,24 +341,26 @@ export function AdminPanel() {
       }
     } catch (error) {
       console.error('Error deleting report:', error)
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`delete-report-${reportId}`]: false }))
     }
   }
 
   const getContentPreview = (report: Report): string => {
     if (report.contentType === 'question') {
-      return report.contentId.title || 'No title'
+      return report.contentId?.title || 'No title'
     } else if (report.contentType === 'answer') {
-      return report.contentId.answer?.substring(0, 100) + '...' || 'No content'
+      return report.contentId?.answer?.substring(0, 100) + '...' || 'No content'
     } else if (report.contentType === 'user') {
-      return report.contentId.username || 'No username'
+      return report.contentId?.username || 'No username'
     }
     return 'Unknown content'
   }
 
   const getContentAuthor = (report: Report): string => {
     if (report.contentType === 'user') {
-      return report.contentId.username || 'Unknown user'
-    } else if (report.contentId.userId) {
+      return report.contentId?.username || 'Unknown user'
+    } else if (report.contentId?.userId) {
       return report.contentId.userId.username || 'Unknown user'
     }
     return 'Unknown author'
@@ -361,9 +378,11 @@ export function AdminPanel() {
     setAdminToken(null)
     localStorage.removeItem('adminToken')
     setStats(null)
+    setStatsLoading(false)
     setUsers([])
     setQuestions([])
     setReports([])
+    setActionLoading({})
     setReportFilter('all')
   }
 
@@ -458,7 +477,24 @@ export function AdminPanel() {
 
       <div className="p-6">
         {/* Stats Cards */}
-        {stats && (
+        {statsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, index) => (
+              <Card key={index} className="bg-[#161B22] border-[#21262D]">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 bg-[#30363D] rounded animate-pulse"></div>
+                    <div className="flex-1">
+                      <div className="h-8 bg-[#30363D] rounded animate-pulse mb-2"></div>
+                      <div className="h-4 bg-[#30363D] rounded animate-pulse w-3/4 mb-1"></div>
+                      <div className="h-3 bg-[#30363D] rounded animate-pulse w-1/2"></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card className="bg-[#161B22] border-[#21262D]">
               <CardContent className="p-6">
@@ -547,17 +583,23 @@ export function AdminPanel() {
                 <CardTitle className="text-[#C9D1D9]">User Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[#21262D]">
-                      <TableHead className="text-[#C9D1D9]">Username</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Email</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Joined</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-400"></div>
+                    <span className="ml-2 text-[#7D8590]">Loading users...</span>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-[#21262D]">
+                        <TableHead className="text-[#C9D1D9]">Username</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Email</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Joined</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
                       <TableRow key={user._id} className="border-[#21262D]">
                         <TableCell className="text-[#C9D1D9]">{user.username}</TableCell>
                         <TableCell className="text-[#7D8590]">{user.email}</TableCell>
@@ -571,6 +613,7 @@ export function AdminPanel() {
                     ))}
                   </TableBody>
                 </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -582,23 +625,29 @@ export function AdminPanel() {
                 <CardTitle className="text-[#C9D1D9]">Question Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[#21262D]">
-                      <TableHead className="text-[#C9D1D9]">Title</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Author</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Views</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Status</TableHead>
-                      <TableHead className="text-[#C9D1D9]">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {questions.map((question) => (
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-400"></div>
+                    <span className="ml-2 text-[#7D8590]">Loading questions...</span>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-[#21262D]">
+                        <TableHead className="text-[#C9D1D9]">Title</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Author</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Views</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Status</TableHead>
+                        <TableHead className="text-[#C9D1D9]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {questions.map((question) => (
                       <TableRow key={question._id} className="border-[#21262D]">
                         <TableCell className="text-[#C9D1D9] max-w-md truncate">
                           {question.title}
                         </TableCell>
-                        <TableCell className="text-[#7D8590]">{question.userId.username}</TableCell>
+                        <TableCell className="text-[#7D8590]">{question.userId?.username || 'Unknown'}</TableCell>
                         <TableCell className="text-[#7D8590]">{question.views}</TableCell>
                         <TableCell>
                           <Badge className={question.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
@@ -611,14 +660,30 @@ export function AdminPanel() {
                               size="sm"
                               variant="outline"
                               onClick={() => toggleQuestionStatus(question._id)}
-                              className="border-[#30363D] text-[#C9D1D9] hover:bg-[#21262D]"
+                              disabled={actionLoading[`toggle-${question._id}`]}
+                              className="border-[#30363D] text-[#C9D1D9] hover:bg-[#21262D] disabled:opacity-50"
                             >
-                              {question.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              {actionLoading[`toggle-${question._id}`] ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                              ) : question.isActive ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="outline" className="border-red-500/30 text-red-400 hover:bg-red-500/10">
-                                  <Trash2 className="h-4 w-4" />
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  disabled={actionLoading[`delete-${question._id}`]}
+                                  className="border-red-500/30 text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                                >
+                                  {actionLoading[`delete-${question._id}`] ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent className="bg-[#161B22] border-[#21262D]">
@@ -645,6 +710,7 @@ export function AdminPanel() {
                     ))}
                   </TableBody>
                 </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -683,7 +749,12 @@ export function AdminPanel() {
                 </div>
               </CardHeader>
               <CardContent>
-                {reports.length === 0 ? (
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-400"></div>
+                    <span className="ml-2 text-[#7D8590]">Loading reports...</span>
+                  </div>
+                ) : reports.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-[#7D8590]">No reports found</p>
                   </div>
@@ -706,7 +777,7 @@ export function AdminPanel() {
                                     {report.status.toUpperCase()}
                                   </Badge>
                                   <p className="text-sm text-[#7D8590] mt-1">
-                                    Reported by {report.reportedBy.username} on {formatDate(report.createdAt)}
+                                    Reported by {report.reportedBy?.username || 'Unknown'} on {formatDate(report.createdAt)}
                                   </p>
                                 </div>
                                 <Badge variant="outline" className="text-[#C9D1D9] border-[#30363D]">
@@ -729,7 +800,7 @@ export function AdminPanel() {
                                   </span>
                                 </div>
                                 <p className="text-sm text-[#7D8590]">{getContentPreview(report)}</p>
-                                {report.contentType === 'question' && report.contentId.description && (
+                                {report.contentType === 'question' && report.contentId?.description && (
                                   <p className="text-xs text-[#7D8590] mt-1 line-clamp-2">
                                     {report.contentId.description.substring(0, 150)}...
                                   </p>
@@ -738,7 +809,7 @@ export function AdminPanel() {
 
                               {report.reviewedBy && (
                                 <div className="text-sm text-[#7D8590]">
-                                  <p>Reviewed by {report.reviewedBy.username} on {formatDate(report.reviewedAt!)}</p>
+                                  <p>Reviewed by {report.reviewedBy?.username || 'Unknown'} on {report.reviewedAt ? formatDate(report.reviewedAt) : 'Unknown date'}</p>
                                   {report.adminNotes && (
                                     <p className="mt-1 text-[#C9D1D9]">Notes: {report.adminNotes}</p>
                                   )}
@@ -753,24 +824,36 @@ export function AdminPanel() {
                                   <Button
                                     size="sm"
                                     onClick={() => updateReportStatus(report._id, 'resolved', 'Content removed/action taken')}
-                                    className="bg-green-600 hover:bg-green-700 text-white flex-1 lg:w-full"
+                                    disabled={actionLoading[`report-${report._id}`]}
+                                    className="bg-green-600 hover:bg-green-700 text-white flex-1 lg:w-full disabled:opacity-50"
                                   >
+                                    {actionLoading[`report-${report._id}`] ? (
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-1"></div>
+                                    ) : null}
                                     Resolve
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() => updateReportStatus(report._id, 'dismissed', 'No action needed')}
-                                    className="border-[#30363D] text-[#C9D1D9] hover:bg-[#21262D] flex-1 lg:w-full"
+                                    disabled={actionLoading[`report-${report._id}`]}
+                                    className="border-[#30363D] text-[#C9D1D9] hover:bg-[#21262D] flex-1 lg:w-full disabled:opacity-50"
                                   >
+                                    {actionLoading[`report-${report._id}`] ? (
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-1"></div>
+                                    ) : null}
                                     Dismiss
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() => updateReportStatus(report._id, 'reviewed', 'Under review')}
-                                    className="border-[#30363D] text-[#C9D1D9] hover:bg-[#21262D] flex-1 lg:w-full"
+                                    disabled={actionLoading[`report-${report._id}`]}
+                                    className="border-[#30363D] text-[#C9D1D9] hover:bg-[#21262D] flex-1 lg:w-full disabled:opacity-50"
                                   >
+                                    {actionLoading[`report-${report._id}`] ? (
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-1"></div>
+                                    ) : null}
                                     Mark Reviewed
                                   </Button>
                                 </>
@@ -781,7 +864,7 @@ export function AdminPanel() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => {
-                                  if (report.contentType === 'question') {
+                                  if (report.contentType === 'question' && report.contentId?._id) {
                                     window.open(`/questions/${report.contentId._id}`, '_blank')
                                   }
                                   // Add logic for other content types as needed
@@ -798,9 +881,14 @@ export function AdminPanel() {
                                   <Button 
                                     size="sm" 
                                     variant="outline" 
-                                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 flex-1 lg:w-full"
+                                    disabled={actionLoading[`delete-report-${report._id}`]}
+                                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 flex-1 lg:w-full disabled:opacity-50"
                                   >
-                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    {actionLoading[`delete-report-${report._id}`] ? (
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-1"></div>
+                                    ) : (
+                                      <Trash2 className="h-4 w-4 mr-1" />
+                                    )}
                                     Delete
                                   </Button>
                                 </AlertDialogTrigger>
