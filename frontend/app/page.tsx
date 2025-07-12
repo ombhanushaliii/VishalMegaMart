@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { RightSidebar } from "@/components/right-sidebar"
 import { MainContent } from "@/components/main-content"
@@ -19,7 +19,7 @@ export default function HomePage() {
 
   const handleLiveThreadSelect = (threadId: string) => {
     setSelectedLiveThread(threadId)
-    setCurrentView("home") // or create a separate "live-threads" view
+    setCurrentView("home") 
   }
 
   return (
