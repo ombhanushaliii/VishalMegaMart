@@ -18,7 +18,7 @@ connectToDb();
 
 //Middlewares
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
+  origin: ['http://localhost:3000', 'https://vishal-mega-mart-rouge.vercel.app'], // Your frontend URL
   credentials: true
 }));
 app.use(express.json());

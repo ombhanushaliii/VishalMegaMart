@@ -162,16 +162,15 @@ Let me know if you need more specific examples!`,
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             <Avatar className="h-12 w-12 border-2 border-[#30363D] transition-all duration-300 hover:border-teal-400">
-              <AvatarImage src={question.author.avatar || "/placeholder.svg"} alt={question.author.name} />
+              <AvatarImage src={question.author.avatar || "/placeholder.svg"} alt={question.author.username} />
               <AvatarFallback className="bg-[#21262D] text-[#C9D1D9]">
-                {question.author.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {question.author.username
+                  .substring(0, 2)
+                  .toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium text-[#C9D1D9]">{question.author.name}</p>
+              <p className="font-medium text-[#C9D1D9]">@{question.author.username}</p>
               <p className="text-sm text-[#7D8590]">
                 {question.author.reputation} reputation • Asked {question.timeAgo}
               </p>
@@ -279,16 +278,15 @@ Let me know if you need more specific examples!`,
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-10 w-10 border-2 border-[#30363D] transition-all duration-300 hover:border-teal-400">
-                  <AvatarImage src={answer.author.avatar || "/placeholder.svg"} alt={answer.author.name} />
+                  <AvatarImage src={answer.author.avatar || "/placeholder.svg"} alt={answer.author.username} />
                   <AvatarFallback className="bg-[#21262D] text-[#C9D1D9]">
-                    {answer.author.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                    {answer.author.username
+                      .substring(0, 2)
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-[#C9D1D9]">{answer.author.name}</p>
+                  <p className="font-medium text-[#C9D1D9]">@{answer.author.username}</p>
                   <p className="text-sm text-[#7D8590]">
                     {answer.author.reputation} reputation • Answered {answer.timeAgo}
                   </p>
