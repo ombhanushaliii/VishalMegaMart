@@ -32,7 +32,7 @@ export function ShareComponent({ questionId, title, description, trigger }: Shar
       
       // Optional: Call backend to log the share if needed
       try {
-        await fetch(`http://localhost:5000/api/v1/questions/${questionId}/share`, {
+        await fetch(`https://vishalmegamart.onrender.com/api/v1/questions/${questionId}/share`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

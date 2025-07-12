@@ -36,7 +36,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     // Only initialize socket on client side
     if (typeof window !== 'undefined' && user && io) {
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io('https://vishalmegamart.onrender.com', {
         withCredentials: true,
       })
 

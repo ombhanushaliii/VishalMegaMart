@@ -36,7 +36,7 @@ export function ProfilePage() {
 
       try {
         const token = localStorage.getItem('token')
-        const response = await fetch('http://localhost:5000/api/v1/user/stats', {
+        const response = await fetch('https://vishalmegamart.onrender.com/api/v1/user/stats', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

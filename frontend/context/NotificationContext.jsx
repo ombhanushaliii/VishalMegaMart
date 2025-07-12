@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 const NotificationContext = createContext()
-const API_BASE_URL = 'http://localhost:5000/api/v1'
+const API_BASE_URL = 'https://vishalmegamart.onrender.com/api/v1'
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext)
