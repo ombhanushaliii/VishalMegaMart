@@ -4,6 +4,26 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 const AuthContext = createContext()
 const API_BASE_URL = 'http://localhost:5000/api/v1'
 
+// Helper function to safely access localStorage
+const safeLocalStorage = {
+  getItem: (key) => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key)
+    }
+    return null
+  },
+  setItem: (key, value) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, value)
+    }
+  },
+  removeItem: (key) => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(key)
+    }
+  }
+}
+
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
@@ -15,16 +35,25 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Mark as client-side to prevent hydration mismatch
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    // Only run after we're on the client side
+    if (!isClient) return
+
     // Check if user is logged in on app load
-    const token = localStorage.getItem('token')
+    const token = safeLocalStorage.getItem('token')
     if (token) {
       fetchUserProfile(token)
     } else {
       setLoading(false)
     }
-  }, [])
+  }, [isClient])
 
   const fetchUserProfile = async (token) => {
     try {
@@ -38,11 +67,11 @@ export const AuthProvider = ({ children }) => {
         const userData = await response.json()
         setUser(userData)
       } else {
-        localStorage.removeItem('token')
+        safeLocalStorage.removeItem('token')
       }
     } catch (error) {
       console.error('Error fetching user profile:', error)
-      localStorage.removeItem('token')
+      safeLocalStorage.removeItem('token')
     } finally {
       setLoading(false)
     }
@@ -62,7 +91,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         setUser(data.user)
-        localStorage.setItem('token', data.token)
+        safeLocalStorage.setItem('token', data.token)
         return { success: true }
       } else {
         return { success: false, error: data.message || 'Login failed' }
@@ -86,7 +115,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         setUser(data.user)
-        localStorage.setItem('token', data.token)
+        safeLocalStorage.setItem('token', data.token)
         return { success: true }
       } else {
         return { success: false, error: data.message || 'Registration failed' }
@@ -98,7 +127,7 @@ export const AuthProvider = ({ children }) => {
 
   const completeOnboarding = async (onboardingData) => {
     try {
-      const token = localStorage.getItem('token')
+      const token = safeLocalStorage.getItem('token')
       const response = await fetch(`${API_BASE_URL}/user/complete-onboarding`, {
         method: 'PUT',
         headers: {
@@ -123,7 +152,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = safeLocalStorage.getItem('token')
       await fetch(`${API_BASE_URL}/user/logout`, {
         method: 'GET',
         headers: {
@@ -131,10 +160,10 @@ export const AuthProvider = ({ children }) => {
         }
       })
     } catch (error) {
-      console.error('Error during logout:', error)
+      console.error('Logout error:', error)
     } finally {
       setUser(null)
-      localStorage.removeItem('token')
+      safeLocalStorage.removeItem('token')
     }
   }
 
