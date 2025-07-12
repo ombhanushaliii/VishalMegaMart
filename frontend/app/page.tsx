@@ -5,7 +5,7 @@ import { Navbar } from "@/components/navbar"
 import { RightSidebar } from "@/components/right-sidebar"
 import { MainContent } from "@/components/main-content"
 
-export type ContentView = "home" | "questions" | "tags" | "help" | "notifications"
+export type ContentView = "home" | "questions" | "tags" | "help" | "notifications" | "profile"
 
 export default function HomePage() {
   const [currentView, setCurrentView] = useState<ContentView>("home")

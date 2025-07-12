@@ -1,6 +1,5 @@
 "use client"
 import { Search, Bell, Home, MessageSquare, Tag, HelpCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -43,12 +42,11 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
           {/* Navigation Items */}
           <div className="hidden lg:flex items-center space-x-2">
             {navigationItems.map((item) => (
-              <Button
+              <button
                 key={item.value}
-                variant="ghost"
                 onClick={() => onViewChange(item.value)}
                 className={cn(
-                  "relative px-3 py-2 text-sm font-medium rounded-lg",
+                  "relative px-3 py-2 text-sm font-medium rounded-lg inline-flex items-center justify-center transition-colors",
                   currentView === item.value
                     ? "bg-gradient-to-r from-teal-500/20 to-blue-500/20 text-teal-400 border border-teal-500/30 shadow-lg"
                     : "text-[#C9D1D9] hover:bg-[#161B22] hover:text-teal-400",
@@ -61,7 +59,7 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
                     {item.count}
                   </Badge>
                 )}
-              </Button>
+              </button>
             ))}
           </div>
 
@@ -81,20 +79,18 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
         <div className="flex items-center space-x-3 flex-shrink-0">
           {/* Notifications */}
           <div className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={() => onViewChange("notifications")}
               className={cn(
-                "rounded-full",
+                "rounded-full hover:shadow-lg transition-shadow duration-200 h-10 w-10 inline-flex items-center justify-center",
                 currentView === "notifications"
                   ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
-                  : "text-[#C9D1D9] hover:bg-[#161B22]",
+                  : "text-[#C9D1D9]",
               )}
             >
               <Bell className="h-5 w-5" />
-            </Button>
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
+            </button>
+            <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
               3
             </Badge>
           </div>
@@ -102,8 +98,7 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
+              <button
                 className={cn(
                   "relative h-10 w-10 rounded-full transition-all duration-300 hover:scale-110",
                   currentView === "profile" && "ring-2 ring-teal-400 ring-offset-2 ring-offset-[#0D1117]",
@@ -113,11 +108,13 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
                   <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
                   <AvatarFallback className="bg-[#161B22] text-[#C9D1D9]">JD</AvatarFallback>
                 </Avatar>
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-56 bg-[#161B22] border-[#30363D] text-[#C9D1D9]"
+              className="w-56 bg-[#161B22] border-[#30363D] text-[#C9D1D9] animate-in slide-in-from-top-2 duration-300 ease-in-out"
               align="end"
+              side="bottom"
+              sideOffset={4}
             >
               <DropdownMenuItem
                 className={cn("hover:bg-[#21262D] cursor-pointer transition-colors duration-200")}
@@ -138,13 +135,11 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
       <div className="lg:hidden border-t border-[#21262D] bg-[#0D1117]">
         <div className="flex flex-wrap justify-between px-4 py-2">
           {navigationItems.slice(0, 4).map((item) => (
-            <Button
+            <button
               key={item.value}
-              variant="ghost"
-              size="sm"
               onClick={() => onViewChange(item.value)}
               className={cn(
-                "flex-1 text-xs",
+                "flex-1 text-xs h-9 rounded-md px-3 inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
                 currentView === item.value
                   ? "bg-teal-500/20 text-teal-400"
                   : "text-[#7D8590] hover:text-[#C9D1D9]",
@@ -152,7 +147,7 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
             >
               <item.icon className="h-3 w-3 mr-1" />
               {item.label}
-            </Button>
+            </button>
           ))}
         </div>
       </div>

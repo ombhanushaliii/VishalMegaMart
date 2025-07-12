@@ -90,7 +90,7 @@ export function RightSidebar({ onLiveThreadSelect }: RightSidebarProps) {
         <div className="p-6 border-b border-[#21262D]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-[#C9D1D9]">Live Threads</h2>
-            <Badge className="bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">Live</Badge>
+            <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Live</Badge>
           </div>
           <p className="text-sm text-[#7D8590]">Join real-time discussions with the community</p>
         </div>
@@ -109,7 +109,7 @@ export function RightSidebar({ onLiveThreadSelect }: RightSidebarProps) {
                     <h3 className="font-medium text-[#C9D1D9] text-sm leading-tight group-hover:text-teal-400 line-clamp-2">
                       {thread.title}
                     </h3>
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs ml-3 flex-shrink-0 animate-pulse">
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs ml-3 flex-shrink-0">
                       Live
                     </Badge>
                   </div>
@@ -125,7 +125,7 @@ export function RightSidebar({ onLiveThreadSelect }: RightSidebarProps) {
                       <div>
                         <span className="text-xs text-[#C9D1D9] font-medium">{thread.creator}</span>
                         <div className="flex items-center space-x-1 mt-1">
-                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                           <span className="text-xs text-[#7D8590]">{thread.participants} active</span>
                         </div>
                       </div>
