@@ -2,25 +2,47 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export default function page() {
+  const { login } = useAuth()
+  const router = useRouter()
+  
   const [formData, setFormData] = useState({
     emailOrUsername: '',
     password: ''
   })
 
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     })
+    setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Login data:', formData)
+    setIsSubmitting(true)
+    setError('')
+    
+    try {
+      const result = await login(formData)
+      if (result.success) {
+        router.push('/')
+      } else {
+        setError(result.error || 'Login failed')
+      }
+    } catch (error) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const togglePasswordVisibility = () => {
@@ -56,6 +78,13 @@ export default function page() {
               </Link>
             </p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -134,13 +163,6 @@ export default function page() {
               </div>
             </div>
 
-            {/* Forgot Password
-            <div className="text-right">
-              <Link href="/forgot-password" className="text-blue-400 hover:text-blue-300 text-sm transition-colors">
-                Forgot password?
-              </Link>
-            </div> */}
-
             {/* Buttons */}
             <div className="flex gap-4 pt-4">
               <button
@@ -151,9 +173,10 @@ export default function page() {
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
-                Sign in
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
           </form>
