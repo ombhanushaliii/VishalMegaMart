@@ -39,8 +39,9 @@ module.exports.getAllQuestions = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const sortBy = req.query.sortBy || 'recent';
+        const tagFilter = req.query.tag || null;
 
-        const result = await questionService.getAllQuestions(page, limit, sortBy);
+        const result = await questionService.getAllQuestions(page, limit, sortBy, tagFilter);
 
         res.status(200).json({
             success: true,
@@ -233,6 +234,23 @@ module.exports.getUserQuestions = async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Failed to fetch user questions' 
+        });
+    }
+};
+
+module.exports.getAllTags = async (req, res) => {
+    try {
+        const tags = await questionService.getAllTags();
+        
+        res.status(200).json({
+            success: true,
+            tags
+        });
+    } catch (error) {
+        console.error('Error fetching tags:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch tags' 
         });
     }
 };

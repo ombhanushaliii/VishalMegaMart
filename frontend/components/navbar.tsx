@@ -1,5 +1,6 @@
 "use client"
-import { Search, Bell, Home, MessageSquare, Tag, HelpCircle, LogIn } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Search, Bell, Home, MessageSquare, Tag, HelpCircle, LogIn, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -13,12 +14,14 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { useAuth } from "@/context/AuthContext"
+import { useQuestions } from '@/context/QuestionContext'
 import { useRouter } from "next/navigation"
 import type { ContentView } from "@/app/page"
 
 interface NavbarProps {
   currentView: ExtendedContentView
   onViewChange: (view: ExtendedContentView) => void
+  onTagSearch?: (tag: string) => void
 }
 
 const navigationItems = [
@@ -30,9 +33,68 @@ const navigationItems = [
 
 type ExtendedContentView = ContentView | "profile" | "notifications"
 
-export function Navbar({ currentView, onViewChange }: NavbarProps) {
+export function Navbar({ currentView, onViewChange, onTagSearch }: NavbarProps) {
   const { user, logout, isAuthenticated } = useAuth()
+  const { fetchTags } = useQuestions()
   const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [tagSuggestions, setTagSuggestions] = useState<any[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Fetch tag suggestions
+  useEffect(() => {
+    if (searchTerm.length >= 2) {
+      fetchTagSuggestions(searchTerm)
+    } else {
+      setTagSuggestions([])
+    }
+  }, [searchTerm])
+
+  const fetchTagSuggestions = async (query: string) => {
+    try {
+      const result = await fetchTags()
+      if (result.success) {
+        const filtered = result.tags.filter((tag: any) =>
+          tag.name.toLowerCase().includes(query.toLowerCase())
+        )
+        setTagSuggestions(filtered)
+        setShowSuggestions(filtered.length > 0)
+      }
+    } catch (error) {
+      console.error('Error fetching tag suggestions:', error)
+    }
+  }
+
+  const handleTagClick = (tagName: string) => {
+    setSearchTerm("")
+    setShowSuggestions(false)
+    onViewChange("tags")
+    if (onTagSearch) {
+      onTagSearch(tagName)
+    }
+  }
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchTerm.trim()) {
+      // Navigate to questions view with search term
+      onViewChange("questions")
+      // Could add search functionality here
+    }
+  }
 
   const handleLogout = () => {
     logout()
@@ -100,14 +162,39 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
           </div>
 
           {/* Search bar */}
-          <div className="max-w-md w-full">
-            <div className="relative">
+          <div className="max-w-md w-full" ref={searchRef}>
+            <form onSubmit={handleSearchSubmit} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7D8590] h-4 w-4" />
               <Input
                 placeholder="Search questions, tags, users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setShowSuggestions(tagSuggestions.length > 0)}
                 className="w-full pl-10 bg-[#161B22] border-[#30363D] text-[#C9D1D9] placeholder:text-[#7D8590] rounded-full focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20"
               />
-            </div>
+              
+              {/* Search suggestions dropdown */}
+              {showSuggestions && tagSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-[#161B22] border border-[#30363D] rounded-lg shadow-lg z-50">
+                  <div className="p-2">
+                    <div className="text-xs text-[#7D8590] mb-2 px-2">Tags</div>
+                    {tagSuggestions.slice(0, 5).map((tag) => (
+                      <button
+                        key={tag._id}
+                        onClick={() => handleTagClick(tag.name)}
+                        className="w-full text-left px-3 py-2 hover:bg-[#21262D] rounded-md transition-colors flex items-center gap-2"
+                      >
+                        <Tag className="h-4 w-4 text-teal-400" />
+                        <span className="text-[#C9D1D9]">{tag.name}</span>
+                        <span className="text-xs text-[#7D8590] ml-auto">
+                          {tag.questionCount} questions
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </form>
           </div>
         </div>
 

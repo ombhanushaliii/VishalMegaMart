@@ -45,10 +45,16 @@ export const QuestionProvider = ({ children }) => {
     }
   }, [])
 
-  const fetchQuestions = useCallback(async (page = 1, sortBy = 'recent') => {
+  const fetchQuestions = useCallback(async (page = 1, sortBy = 'recent', tagFilter = null) => {
     try {
       setLoading(true)
-      const response = await fetch(`${API_BASE_URL}/questions?page=${page}&sortBy=${sortBy}`)
+      let url = `${API_BASE_URL}/questions?page=${page}&sortBy=${sortBy}`
+      
+      if (tagFilter) {
+        url += `&tag=${encodeURIComponent(tagFilter)}`
+      }
+      
+      const response = await fetch(url)
       const data = await response.json()
 
       if (response.ok) {
@@ -145,6 +151,21 @@ export const QuestionProvider = ({ children }) => {
     }
   }, [])
 
+  const fetchTags = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/questions/tags`)
+      const data = await response.json()
+
+      if (response.ok) {
+        return { success: true, tags: data.tags }
+      } else {
+        return { success: false, error: data.message }
+      }
+    } catch (error) {
+      return { success: false, error: 'Network error' }
+    }
+  }, [])
+
   const value = {
     questions,
     currentQuestion,
@@ -154,6 +175,7 @@ export const QuestionProvider = ({ children }) => {
     fetchQuestionById,
     voteQuestion,
     searchQuestions,
+    fetchTags,
     setCurrentQuestion
   }
 

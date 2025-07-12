@@ -5,6 +5,7 @@ import { QuestionFeed } from "@/components/question-feed"
 import { NotificationsPage } from "@/components/notifications-page"
 import { LiveThreadChat } from "@/components/live-thread-chat"
 import { ProfilePage } from "@/components/profile-page"
+import { TagsPage } from "@/components/tags-page"
 import type { ContentView } from "@/app/page"
 
 interface MainContentProps {
@@ -66,12 +67,7 @@ function WelcomeSection() {
 }
 
 function TagsView() {
-  return (
-    <div className="bg-[#161B22] rounded-xl border border-[#21262D] p-8 text-center">
-      <h2 className="text-2xl font-bold text-[#C9D1D9] mb-4">Tags</h2>
-      <p className="text-[#7D8590]">Browse all tags and topics in the community.</p>
-    </div>
-  )
+  return <TagsPage />
 }
 
 function HelpView() {

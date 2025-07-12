@@ -10,12 +10,17 @@ module.exports.createQuestion = async ({ title, description, userId, tags }) => 
     return question;
 };
 
-module.exports.getAllQuestions = async (page = 1, limit = 10, sortBy = 'recent') => {
+module.exports.getAllQuestions = async (page = 1, limit = 10, sortBy = 'recent', tagFilter = null) => {
     const skip = (page - 1) * limit;
     let sortOption = {};
     let pipeline = [
         { $match: { isActive: true } }
     ];
+
+    // Add tag filter if provided
+    if (tagFilter) {
+        pipeline.push({ $match: { tags: { $in: [tagFilter] } } });
+    }
 
     // Add lookup to get answer count
     pipeline.push({
@@ -82,7 +87,15 @@ module.exports.getAllQuestions = async (page = 1, limit = 10, sortBy = 'recent')
 
     // Get total count for pagination
     let countPipeline = [
-        { $match: { isActive: true } },
+        { $match: { isActive: true } }
+    ];
+
+    // Add tag filter to count pipeline if provided
+    if (tagFilter) {
+        countPipeline.push({ $match: { tags: { $in: [tagFilter] } } });
+    }
+
+    countPipeline.push(
         {
             $lookup: {
                 from: 'answers',
@@ -96,7 +109,7 @@ module.exports.getAllQuestions = async (page = 1, limit = 10, sortBy = 'recent')
                 answerCount: { $size: '$answers' }
             }
         }
-    ];
+    );
 
     if (sortBy === 'unanswered') {
         countPipeline.push({ $match: { answerCount: 0 } });
@@ -230,4 +243,28 @@ module.exports.getUserQuestions = async (userId, page = 1, limit = 10) => {
             totalQuestions: total
         }
     };
+};
+
+module.exports.getAllTags = async () => {
+    const pipeline = [
+        { $match: { isActive: true } },
+        { $unwind: '$tags' },
+        { 
+            $group: {
+                _id: '$tags',
+                count: { $sum: 1 }
+            }
+        },
+        { 
+            $project: {
+                _id: 0,
+                name: '$_id',
+                questionCount: '$count'
+            }
+        },
+        { $sort: { questionCount: -1 } }
+    ];
+
+    const tags = await questionModel.aggregate(pipeline);
+    return tags;
 };

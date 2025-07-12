@@ -20,6 +20,9 @@ router.post('/', authMiddleware.authUser, [
 // Get all questions
 router.get('/', questionController.getAllQuestions);
 
+// Get all tags
+router.get('/tags', questionController.getAllTags);
+
 // Search questions
 router.get('/search', questionController.searchQuestions);
 

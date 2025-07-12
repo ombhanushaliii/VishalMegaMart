@@ -23,7 +23,7 @@ interface LeftSidebarProps {
 
 const menuItems = [
   { icon: Home, label: "Home", active: true, count: null },
-  { icon: MessageSquare, label: "Questions", active: false, count: 524 },
+  { icon: MessageSquare, label: "Questions", active: false, count: 2 },
   { icon: TrendingUp, label: "Most Answered", active: false, count: null },
   { icon: BarChart3, label: "Polls", active: false, count: null },
   { icon: Users, label: "Groups", active: false, count: null },

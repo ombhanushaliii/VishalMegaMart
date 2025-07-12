@@ -29,7 +29,7 @@ interface Question {
 }
 
 interface QuestionFeedProps {
-  // No props needed since we're using router navigation
+  searchTag?: string // Optional tag filter
 }
 
 export function QuestionFeed(props?: QuestionFeedProps) {
@@ -38,21 +38,22 @@ export function QuestionFeed(props?: QuestionFeedProps) {
   const router = useRouter()
   const [activeFilter, setActiveFilter] = useState<"recent" | "answered" | "unanswered">("recent")
   const hasInitialized = useRef(false)
+  const { searchTag } = props || {}
 
   // Use useEffect with proper dependencies to prevent infinite loops
   useEffect(() => {
     if (!hasInitialized.current) {
-      fetchQuestions(1, activeFilter)
+      fetchQuestions(1, activeFilter, searchTag)
       hasInitialized.current = true
     }
-  }, []) // Empty dependency array for initial load
+  }, [searchTag]) // Include searchTag in dependencies
 
   // Separate effect for filter changes
   useEffect(() => {
     if (hasInitialized.current) {
-      fetchQuestions(1, activeFilter)
+      fetchQuestions(1, activeFilter, searchTag)
     }
-  }, [activeFilter]) // Only depend on activeFilter
+  }, [activeFilter, searchTag]) // Include searchTag in dependencies
 
   const handleQuestionClick = (questionId: string) => {
     // Use router navigation to go to dynamic route

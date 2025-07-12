@@ -23,7 +23,7 @@ interface NavbarProps {
 
 const navigationItems = [
   { icon: Home, label: "Home", value: "home" as ContentView, requiresAuth: true },
-  { icon: MessageSquare, label: "Questions", value: "questions" as ContentView, count: 524, requiresAuth: false },
+  { icon: MessageSquare, label: "Questions", value: "questions" as ContentView, count: 2, requiresAuth: false },
   { icon: Tag, label: "Tags", value: "tags" as ContentView, requiresAuth: false },
   { icon: HelpCircle, label: "Help", value: "help" as ContentView, requiresAuth: false },
 ]
