@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
+const API_BASE_URL = 'http://localhost:5000/api/v1'
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
@@ -17,89 +18,135 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is logged in on app load
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
+    const token = localStorage.getItem('token')
+    if (token) {
+      fetchUserProfile(token)
+    } else {
+      setLoading(false)
     }
-    setLoading(false)
   }, [])
+
+  const fetchUserProfile = async (token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const userData = await response.json()
+        setUser(userData)
+      } else {
+        localStorage.removeItem('token')
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+      localStorage.removeItem('token')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const login = async (credentials) => {
     try {
-      // Simulate API call - in real app, this would be an actual API call
-      const users = JSON.parse(localStorage.getItem('users') || '[]')
-      const user = users.find(u => 
-        (u.email === credentials.emailOrUsername || u.username === credentials.emailOrUsername) && 
-        u.password === credentials.password
-      )
-      
-      if (user) {
-        const { password, ...userWithoutPassword } = user
-        setUser(userWithoutPassword)
-        localStorage.setItem('user', JSON.stringify(userWithoutPassword))
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        localStorage.setItem('token', data.token)
         return { success: true }
       } else {
-        return { success: false, error: 'Invalid credentials' }
+        return { success: false, error: data.message || 'Login failed' }
       }
     } catch (error) {
-      return { success: false, error: 'Login failed' }
+      return { success: false, error: 'Network error' }
     }
   }
 
   const register = async (userData) => {
     try {
-      // Check if user already exists
-      const users = JSON.parse(localStorage.getItem('users') || '[]')
-      const existingUser = users.find(u => u.email === userData.email || u.username === userData.username)
-      
-      if (existingUser) {
-        return { success: false, error: 'User already exists' }
-      }
+      const response = await fetch(`${API_BASE_URL}/user/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      })
 
-      // Create new user
-      const newUser = {
-        id: Date.now().toString(),
-        ...userData,
-        createdAt: new Date().toISOString(),
-        needsOnboarding: true
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        localStorage.setItem('token', data.token)
+        return { success: true }
+      } else {
+        return { success: false, error: data.message || 'Registration failed' }
       }
-      
-      users.push(newUser)
-      localStorage.setItem('users', JSON.stringify(users))
-      
-      // Auto-login after registration
-      const { password, ...userWithoutPassword } = newUser
-      setUser(userWithoutPassword)
-      localStorage.setItem('user', JSON.stringify(userWithoutPassword))
-      
-      return { success: true }
     } catch (error) {
-      return { success: false, error: 'Registration failed' }
+      return { success: false, error: 'Network error' }
     }
   }
 
-  const completeOnboarding = (onboardingData) => {
-    const updatedUser = { ...user, ...onboardingData, needsOnboarding: false }
-    setUser(updatedUser)
-    localStorage.setItem('user', JSON.stringify(updatedUser))
-    
-    // Update in users array
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
-    const userIndex = users.findIndex(u => u.id === user.id)
-    if (userIndex !== -1) {
-      users[userIndex] = { ...users[userIndex], ...onboardingData, needsOnboarding: false }
-      localStorage.setItem('users', JSON.stringify(users))
+  const completeOnboarding = async (onboardingData) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_BASE_URL}/user/complete-onboarding`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(onboardingData)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        return { success: true }
+      } else {
+        return { success: false, error: data.message || 'Onboarding failed' }
+      }
+    } catch (error) {
+      return { success: false, error: 'Network error' }
     }
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user')
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      await fetch(`${API_BASE_URL}/user/logout`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+    } catch (error) {
+      console.error('Error during logout:', error)
+    } finally {
+      setUser(null)
+      localStorage.removeItem('token')
+    }
   }
 
-  const checkUsernameAvailability = (username) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
-    return !users.some(u => u.username === username)
+  const checkUsernameAvailability = async (username) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/check-username/${username}`)
+      const data = await response.json()
+      return data.available
+    } catch (error) {
+      console.error('Error checking username:', error)
+      return false
+    }
   }
 
   const value = {

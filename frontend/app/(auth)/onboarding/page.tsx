@@ -66,12 +66,14 @@ export default function OnboardingPage() {
   const [formData, setFormData] = useState({
     age: '',
     occupation: '',
-    areasOfInterest: [] as string[]
+    areaofinterest: [] as string[]
   })
   
   const [currentStep, setCurrentStep] = useState(1)
   const [customOccupation, setCustomOccupation] = useState('')
   const [searchInterest, setSearchInterest] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const handleNext = () => {
     if (currentStep < 3) {
@@ -87,21 +89,36 @@ export default function OnboardingPage() {
     }
   }
 
-  const handleSubmit = () => {
-    const finalData = {
-      ...formData,
-      occupation: formData.occupation === 'Other' ? customOccupation : formData.occupation
-    }
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    setError('')
     
-    completeOnboarding(finalData)
-    router.push('/')
+    try {
+      const finalData = {
+        age: parseInt(formData.age),
+        occupation: formData.occupation === 'Other' ? customOccupation : formData.occupation,
+        areaofinterest: formData.areaofinterest
+      }
+      
+      const result = await completeOnboarding(finalData)
+      
+      if (result.success) {
+        router.push('/')
+      } else {
+        setError(result.error || 'Onboarding failed')
+      }
+    } catch (error) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const addInterest = (interest: string) => {
-    if (!formData.areasOfInterest.includes(interest) && formData.areasOfInterest.length < 10) {
+    if (!formData.areaofinterest.includes(interest) && formData.areaofinterest.length < 10) {
       setFormData({
         ...formData,
-        areasOfInterest: [...formData.areasOfInterest, interest]
+        areaofinterest: [...formData.areaofinterest, interest]
       })
     }
   }
@@ -109,13 +126,13 @@ export default function OnboardingPage() {
   const removeInterest = (interest: string) => {
     setFormData({
       ...formData,
-      areasOfInterest: formData.areasOfInterest.filter(item => item !== interest)
+      areaofinterest: formData.areaofinterest.filter(item => item !== interest)
     })
   }
 
   const filteredInterests = interestOptions.filter(interest =>
     interest.toLowerCase().includes(searchInterest.toLowerCase()) &&
-    !formData.areasOfInterest.includes(interest)
+    !formData.areaofinterest.includes(interest)
   )
 
   const canProceed = () => {
@@ -125,7 +142,7 @@ export default function OnboardingPage() {
       case 2:
         return formData.occupation && (formData.occupation !== 'Other' || customOccupation.trim())
       case 3:
-        return formData.areasOfInterest.length > 0
+        return formData.areaofinterest.length > 0
       default:
         return false
     }
@@ -141,6 +158,13 @@ export default function OnboardingPage() {
           <p className="text-[#7D8590]">
             Let's personalize your experience with a few quick questions
           </p>
+          
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
           
           {/* Progress indicator */}
           <div className="flex justify-center mt-6">
@@ -241,11 +265,11 @@ export default function OnboardingPage() {
               />
               
               {/* Selected interests */}
-              {formData.areasOfInterest.length > 0 && (
+              {formData.areaofinterest.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm text-[#7D8590]">Selected ({formData.areasOfInterest.length}/10):</p>
+                  <p className="text-sm text-[#7D8590]">Selected ({formData.areaofinterest.length}/10):</p>
                   <div className="flex flex-wrap gap-2">
-                    {formData.areasOfInterest.map((interest) => (
+                    {formData.areaofinterest.map((interest) => (
                       <Badge
                         key={interest}
                         variant="secondary"
@@ -291,12 +315,12 @@ export default function OnboardingPage() {
             
             <Button
               onClick={handleNext}
-              disabled={!canProceed()}
+              disabled={!canProceed() || isSubmitting}
               className="bg-teal-500 text-white hover:bg-teal-600 disabled:opacity-50"
             >
               {currentStep === 3 ? (
                 <>
-                  Complete
+                  {isSubmitting ? 'Completing...' : 'Complete'}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               ) : (
