@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "STACKIt",
   description: "A platform for developers to ask questions and share knowledge",
+  icons: '/logo.png'
 }
 
 export default function RootLayout({

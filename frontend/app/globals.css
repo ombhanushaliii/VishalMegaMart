@@ -208,3 +208,85 @@ textarea:focus-visible {
 .hljs-variable { color: #ffa657; }
 .hljs-attr { color: #79c0ff; }
 .hljs-tag { color: #7ee8fa; }
+
+/* HTML Renderer Styles - For displaying rich text content from QuillEditor */
+.prose p {
+  margin: 8px 0;
+  color: #C9D1D9;
+  line-height: 1.6;
+}
+
+.prose strong {
+  color: #C9D1D9;
+  font-weight: 600;
+}
+
+.prose em {
+  color: #C9D1D9;
+  font-style: italic;
+}
+
+.prose u {
+  color: #C9D1D9;
+  text-decoration: underline;
+}
+
+.prose s {
+  color: #C9D1D9;
+  text-decoration: line-through;
+}
+
+.prose code {
+  background-color: #21262D;
+  border-radius: 4px;
+  color: #7ee8fa;
+  font-size: 0.875rem;
+  padding: 2px 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+}
+
+.prose blockquote {
+  border-left: 4px solid #30363D;
+  margin: 16px 0;
+  padding-left: 16px;
+  font-style: italic;
+  color: #7D8590;
+}
+
+.prose ul, .prose ol {
+  padding-left: 24px;
+  margin: 12px 0;
+}
+
+.prose li {
+  margin: 4px 0;
+  color: #C9D1D9;
+}
+
+.prose a {
+  color: #58a6ff;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #79c0ff;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  color: #C9D1D9;
+}
+
+.prose h1 { font-size: 1.5rem; }
+.prose h2 { font-size: 1.25rem; }
+.prose h3 { font-size: 1.125rem; }
+
+/* Ensure proper spacing for HTML content */
+.prose > *:first-child {
+  margin-top: 0;
+}
+
+.prose > *:last-child {
+  margin-bottom: 0;
+}

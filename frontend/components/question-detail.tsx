@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
+import { HtmlRenderer } from "@/components/ui/html-renderer"
 
 interface QuestionDetailProps {
   questionId: number
@@ -201,9 +202,10 @@ Let me know if you need more specific examples!`,
         <h1 className="text-2xl font-bold text-[#C9D1D9] mb-4">{question.title}</h1>
 
         {/* Question Content */}
-        <div className="prose prose-invert max-w-none mb-6">
-          <div className="text-[#C9D1D9] leading-relaxed whitespace-pre-wrap">{question.content}</div>
-        </div>
+        <HtmlRenderer 
+          content={question.content} 
+          className="mb-6"
+        />
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-6">
@@ -295,9 +297,10 @@ Let me know if you need more specific examples!`,
             </div>
 
             {/* Answer Content */}
-            <div className="prose prose-invert max-w-none mb-4">
-              <div className="text-[#C9D1D9] leading-relaxed whitespace-pre-wrap">{answer.content}</div>
-            </div>
+            <HtmlRenderer 
+              content={answer.content} 
+              className="mb-4"
+            />
 
             {/* Answer Actions */}
             <div className="flex items-center space-x-4 border-t border-[#21262D] pt-4">

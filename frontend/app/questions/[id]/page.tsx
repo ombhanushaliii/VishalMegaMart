@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { ReportDialog } from "@/components/ui/report-dialog"
+import { HtmlRenderer } from "@/components/ui/html-renderer"
+import { QuillEditor } from "@/components/ui/quill-editor"
 import { useAuth } from '@/context/AuthContext'
 
 interface User {
@@ -301,11 +303,10 @@ export default function QuestionDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert max-w-none mb-6">
-              <div className="text-[#C9D1D9] whitespace-pre-wrap">
-                {question.description}
-              </div>
-            </div>
+            <HtmlRenderer 
+              content={question.description || ''} 
+              className="mb-6"
+            />
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -316,7 +317,7 @@ export default function QuestionDetailPage() {
                     size="sm"
                     onClick={() => handleVoteQuestion('upvote')}
                     className={`p-1 h-8 w-8 ${
-                      question.upvotes.includes(user?.id || '') 
+                      question.upvotes?.includes(user?.id || '') 
                         ? 'text-green-400 bg-green-500/10' 
                         : 'text-[#7D8590] hover:text-green-400'
                     }`}
@@ -331,7 +332,7 @@ export default function QuestionDetailPage() {
                     size="sm"
                     onClick={() => handleVoteQuestion('downvote')}
                     className={`p-1 h-8 w-8 ${
-                      question.downvotes.includes(user?.id || '') 
+                      question.downvotes?.includes(user?.id || '') 
                         ? 'text-red-400 bg-red-500/10' 
                         : 'text-[#7D8590] hover:text-red-400'
                     }`}
@@ -388,7 +389,7 @@ export default function QuestionDetailPage() {
                         size="sm"
                         onClick={() => handleVoteAnswer(answer._id, 'upvote')}
                         className={`p-1 h-8 w-8 ${
-                          answer.upvotes.includes(user?.id || '') 
+                          answer.upvotes?.includes(user?.id || '') 
                             ? 'text-green-400 bg-green-500/10' 
                             : 'text-[#7D8590] hover:text-green-400'
                         }`}
@@ -403,7 +404,7 @@ export default function QuestionDetailPage() {
                         size="sm"
                         onClick={() => handleVoteAnswer(answer._id, 'downvote')}
                         className={`p-1 h-8 w-8 ${
-                          answer.downvotes.includes(user?.id || '') 
+                          answer.downvotes?.includes(user?.id || '') 
                             ? 'text-red-400 bg-red-500/10' 
                             : 'text-[#7D8590] hover:text-red-400'
                         }`}
@@ -438,11 +439,10 @@ export default function QuestionDetailPage() {
 
                     {/* Answer content */}
                     <div className="flex-1">
-                      <div className="prose prose-invert max-w-none mb-4">
-                        <div className="text-[#C9D1D9] whitespace-pre-wrap">
-                          {answer.answer}
-                        </div>
-                      </div>
+                      <HtmlRenderer 
+                        content={answer.answer || ''} 
+                        className="mb-4"
+                      />
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -496,12 +496,10 @@ export default function QuestionDetailPage() {
                   </div>
                 )}
                 
-                <Textarea
+                <QuillEditor
                   value={newAnswer}
-                  onChange={(e) => setNewAnswer(e.target.value)}
+                  onChange={setNewAnswer}
                   placeholder="Write your answer here... (minimum 10 characters)"
-                  className="bg-[#0D1117] border-[#30363D] text-[#C9D1D9] placeholder:text-[#7D8590] focus:border-teal-400 min-h-[120px]"
-                  maxLength={5000}
                 />
                 
                 <div className="flex justify-between items-center">
