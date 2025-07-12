@@ -5,6 +5,7 @@ import { QuestionFeed } from "@/components/question-feed"
 import { QuestionDetail } from "@/components/question-detail"
 import { NotificationsPage } from "@/components/notifications-page"
 import { LiveThreadChat } from "@/components/live-thread-chat"
+import { ProfilePage } from "@/components/profile-page"
 import type { ContentView } from "@/app/page"
 
 interface MainContentProps {
@@ -48,6 +49,8 @@ export function MainContent({
         return <TagsView />
       case "help":
         return <HelpView />
+      case "profile":
+        return <ProfilePage />
       default:
         return <QuestionFeed onQuestionSelect={onQuestionSelect} />
     }
