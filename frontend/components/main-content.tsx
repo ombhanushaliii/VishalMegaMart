@@ -67,37 +67,9 @@ function WelcomeSection() {
   return (
     <div className="bg-[#161B22] rounded-xl border border-[#21262D] p-6">
       <h1 className="text-2xl font-bold text-[#C9D1D9] mb-2">Welcome Back, Developer!</h1>
-      <p className="text-[#7D8590] mb-6">
+      <p className="text-[#7D8590]">
         Find the technical answers you need and assist others in finding the answers they need.
       </p>
-
-      {/* Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-teal-400">524</div>
-          <div className="text-xs text-[#7D8590]">Questions</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-blue-400">169</div>
-          <div className="text-xs text-[#7D8590]">Answers</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-green-400">890+</div>
-          <div className="text-xs text-[#7D8590]">Best Answer</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-purple-400">12K</div>
-          <div className="text-xs text-[#7D8590]">Viewed Tag</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-orange-400">870+</div>
-          <div className="text-xs text-[#7D8590]">Votes</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-pink-400">12K</div>
-          <div className="text-xs text-[#7D8590]">Users</div>
-        </div>
-      </div>
     </div>
   )
 }

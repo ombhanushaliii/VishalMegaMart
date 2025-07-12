@@ -166,65 +166,57 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
         </div>
       </div>
 
-      <div className="space-y-3 md:space-y-4">
+      <div className="space-y-1">
         {filteredQuestions.map((question) => (
-          <div
+          <article
             key={question.id}
-            className="bg-[#161B22] rounded-xl border border-[#21262D] p-3 sm:p-4 md:p-6 hover:border-[#30363D] transition-all duration-300 group cursor-pointer hover:shadow-lg hover:scale-[1.01]"
+            className="bg-[#161B22] border border-[#21262D] hover:border-[#30363D] transition-colors cursor-pointer"
             onClick={() => onQuestionSelect?.(question.id)}
           >
-            {/* Question Header */}
-            <div className="flex items-start justify-between mb-3 md:mb-4 gap-2">
-              <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
-                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-[#30363D] transition-all duration-300 group-hover:border-teal-400 flex-shrink-0">
+            {/* Post Header */}
+            <div className="px-4 py-3 border-b border-[#21262D]/50">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8 border border-[#30363D]">
                   <AvatarImage src={question.author.avatar || "/placeholder.svg"} alt={question.author.name} />
-                  <AvatarFallback className="bg-[#21262D] text-[#C9D1D9] text-xs sm:text-sm">
+                  <AvatarFallback className="bg-[#21262D] text-[#C9D1D9] text-sm font-medium">
                     {question.author.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-[#C9D1D9] text-sm sm:text-base truncate">{question.author.name}</p>
-                  <p className="text-xs sm:text-sm text-[#7D8590] truncate">Asked {question.timeAgo} • Development</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-[#C9D1D9] text-sm truncate">{question.author.name}</span>
+                    <span className="text-[#7D8590] text-sm">@{question.author.username}</span>
+                    <span className="text-[#7D8590] text-sm">·</span>
+                    <span className="text-[#7D8590] text-sm">{question.timeAgo}</span>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-[#7D8590] hover:text-teal-400 transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                  <span className="hidden sm:inline">Follow</span>
-                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] transition-all duration-200 hover:scale-110 h-8 w-8 sm:h-9 sm:w-9"
+                      className="h-8 w-8 text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-full"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="bg-[#161B22] border-[#30363D] text-[#C9D1D9] animate-in slide-in-from-top-2 duration-200"
+                    className="bg-[#161B22] border-[#30363D] text-[#C9D1D9]"
                     align="end"
                   >
-                    <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer transition-colors duration-200">
+                    <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer">
                       <Share className="h-4 w-4 mr-2" />
                       Share
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer transition-colors duration-200">
+                    <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer">
                       <Bookmark className="h-4 w-4 mr-2" />
                       Bookmark
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer text-red-400 transition-colors duration-200">
+                    <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer text-red-400">
                       Report
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -232,72 +224,82 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
               </div>
             </div>
 
-            {/* Question Content */}
-            <div className="mb-3 md:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold text-[#C9D1D9] mb-2 group-hover:text-teal-400 transition-colors duration-300 line-clamp-2">
+            {/* Post Content */}
+            <div className="px-4 py-3">
+              <h2 className="text-[#C9D1D9] text-lg font-semibold mb-2 leading-snug">
                 {question.title}
-              </h3>
-              <p className="text-[#7D8590] leading-relaxed text-sm sm:text-base line-clamp-2 sm:line-clamp-3">{question.content}</p>
-            </div>
+              </h2>
+              <p className="text-[#7D8590] text-sm leading-relaxed mb-3 line-clamp-3">
+                {question.content}
+              </p>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 md:mb-4">
-              {question.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="bg-teal-500/10 text-teal-400 border border-teal-500/20 hover:bg-teal-500/20 cursor-pointer transition-all duration-200 hover:scale-105 text-xs px-2 py-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-
-            {/* Actions and Stats */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-              <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-                {/* Voting */}
-                <div className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-[#7D8590] hover:text-green-400 hover:bg-green-500/10 p-1 transition-all duration-200 hover:scale-110"
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {question.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    className="bg-[#21262D] text-[#7D8590] hover:bg-[#30363D] hover:text-[#C9D1D9] border-0 text-xs px-2 py-1 rounded-full font-normal cursor-pointer transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
-                  </Button>
-                  <span className="text-xs sm:text-sm font-medium text-[#C9D1D9] min-w-[1.5rem] sm:min-w-[2rem] text-center">
-                    {question.stats.votes}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-[#7D8590] hover:text-red-400 hover:bg-red-500/10 p-1 transition-all duration-200 hover:scale-110"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4" />
-                  </Button>
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center space-x-3 sm:space-x-4 text-xs sm:text-sm text-[#7D8590]">
-                  <div className="flex items-center space-x-1">
-                    <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>{question.stats.answers} answers</span>
-                  </div>
-                </div>
+                    #{tag}
+                  </Badge>
+                ))}
               </div>
 
-              {/* Answer Button */}
-              <Button
-                className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-lg px-4 sm:px-6 py-2 font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm w-full sm:w-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Answer
-              </Button>
+              {/* Engagement Bar */}
+              <div className="flex items-center justify-between text-[#7D8590] text-sm">
+                <div className="flex items-center gap-6">
+                  {/* Upvote/Downvote */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-[#7D8590] hover:text-green-400 hover:bg-green-500/10 rounded-full"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <span className="min-w-[2rem] text-center font-medium">{question.stats.votes}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-[#7D8590] hover:text-red-400 hover:bg-red-500/10 rounded-full"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Comments */}
+                  <div className="flex items-center gap-2 hover:text-[#C9D1D9] cursor-pointer transition-colors">
+                    <MessageSquare className="h-4 w-4" />
+                    <span>{question.stats.answers}</span>
+                  </div>
+
+                  {/* Share */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-3 text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-full transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Share className="h-4 w-4 mr-1" />
+                    Share
+                  </Button>
+                </div>
+
+                {/* Save */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Bookmark className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
+          </article>
         ))}
       </div>
 
