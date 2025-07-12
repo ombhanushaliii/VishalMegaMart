@@ -2,7 +2,7 @@
 
 ### Team: VishaMegaMart
 
-### Video link: https://youtube.com
+### Video link: https://youtu.be/3EmQys5ZU04
 
 ### Tech Stack
 **Frontend:** Next JS
