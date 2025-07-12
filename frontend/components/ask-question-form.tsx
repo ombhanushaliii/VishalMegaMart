@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { QuillEditor } from "@/components/ui/quill-editor"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { useQuestions } from "@/context/QuestionContext"
 import { useAuth } from "@/context/AuthContext"
 
@@ -102,13 +103,14 @@ export function AskQuestionForm() {
         {/* Rich Text Editor */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Question Details</label>
-          <QuillEditor
-            value={content}
-            onChange={setContent}
-            placeholder="Describe your question in detail. Include what you've tried and what specific help you need..."
+          <RichTextEditor
+            content={content}
+            onUpdate={setContent}
+            placeholder="Describe your question in detail. Include what you've tried and what specific help you need. You can mention users with @username..."
+            className="min-h-[200px]"
           />
           <p className="text-xs text-[#7D8590] mt-1">
-            {content.length}/5000 characters
+            Use @ to mention users in your question
           </p>
         </div>
 

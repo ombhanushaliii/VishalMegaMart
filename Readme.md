@@ -2,6 +2,17 @@
 
 ### Team: VishaMegaMart
 
+### Video link: https://youtube.com
+
+#### Tech Stack
+**Frontend:** Next JS
+
+**Backend:** Node JS
+
+**Database:** Mongo DB
+
+**Rich Text Editor:** Quilljs API
+
 #### Team Members
 
 **Om Dwivedi**  

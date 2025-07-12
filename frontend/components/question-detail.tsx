@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { HtmlRenderer } from "@/components/ui/html-renderer"
+import { ShareComponent } from "@/components/ui/share-component"
 
 interface QuestionDetailProps {
   questionId: number
@@ -179,14 +180,11 @@ Let me know if you need more specific examples!`,
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-[#7D8590] hover:text-teal-400 transition-all duration-200 hover:scale-105"
-            >
-              <Share className="h-4 w-4 mr-1" />
-              Share
-            </Button>
+            <ShareComponent
+              questionId={question.id.toString()}
+              title={question.title}
+              description={question.content}
+            />
             <Button
               variant="ghost"
               size="sm"

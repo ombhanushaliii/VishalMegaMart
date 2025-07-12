@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { useAuth } from "@/context/AuthContext"
 import { useQuestions } from '@/context/QuestionContext'
+import { useNotifications } from '@/context/NotificationContext'
 import { useRouter } from "next/navigation"
 import type { ContentView } from "@/app/page"
 
@@ -26,7 +27,7 @@ interface NavbarProps {
 
 const navigationItems = [
   { icon: Home, label: "Home", value: "home" as ContentView, requiresAuth: true },
-  { icon: MessageSquare, label: "Questions", value: "questions" as ContentView, count: 524, requiresAuth: false },
+  { icon: MessageSquare, label: "Questions", value: "questions" as ContentView, count: 2, requiresAuth: false },
   { icon: Tag, label: "Tags", value: "tags" as ContentView, requiresAuth: false },
   { icon: HelpCircle, label: "Help", value: "help" as ContentView, requiresAuth: false },
 ]
@@ -36,11 +37,19 @@ type ExtendedContentView = ContentView | "profile" | "notifications"
 export function Navbar({ currentView, onViewChange, onTagSearch }: NavbarProps) {
   const { user, logout, isAuthenticated } = useAuth()
   const { fetchTags } = useQuestions()
+  const { unreadCount, fetchUnreadCount } = useNotifications()
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [tagSuggestions, setTagSuggestions] = useState<any[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
+
+  // Fetch unread notifications count
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUnreadCount()
+    }
+  }, [isAuthenticated, fetchUnreadCount])
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -215,9 +224,11 @@ export function Navbar({ currentView, onViewChange, onTagSearch }: NavbarProps) 
                 >
                   <Bell className="h-5 w-5" />
                 </button>
-                <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
-                  3
-                </Badge>
+                {unreadCount > 0 && (
+                  <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
               </div>
 
               {/* User menu */}

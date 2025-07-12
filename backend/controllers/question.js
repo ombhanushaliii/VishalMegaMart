@@ -254,3 +254,36 @@ module.exports.getAllTags = async (req, res) => {
         });
     }
 };
+
+module.exports.shareQuestion = async (req, res) => {
+    try {
+        const questionId = req.params.questionId;
+        const question = await questionService.getQuestionById(questionId);
+
+        if (!question) {
+            return res.status(404).json({
+                success: false,
+                message: 'Question not found'
+            });
+        }
+
+        // Generate shareable link
+        const shareLink = `${req.protocol}://${req.get('host')}/questions/${questionId}`;
+        
+        res.status(200).json({
+            success: true,
+            shareLink,
+            question: {
+                _id: question._id,
+                title: question.title,
+                description: question.description.substring(0, 200) + '...'
+            }
+        });
+    } catch (error) {
+        console.error('Error sharing question:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to share question' 
+        });
+    }
+};

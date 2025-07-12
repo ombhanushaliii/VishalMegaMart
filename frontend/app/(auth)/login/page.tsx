@@ -166,12 +166,6 @@ export default function page() {
             {/* Buttons */}
             <div className="flex gap-4 pt-4">
               <button
-                type="button"
-                className="flex-1 py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-              >
-                Change method
-              </button>
-              <button
                 type="submit"
                 className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSubmitting}

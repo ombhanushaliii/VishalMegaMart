@@ -26,6 +26,10 @@ const answerSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }],
+    mentions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }],
     isAccepted: {
         type: Boolean,
         default: false

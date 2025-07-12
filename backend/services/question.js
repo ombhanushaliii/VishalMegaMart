@@ -1,12 +1,35 @@
 const questionModel = require('../models/question');
+const userModel = require('../models/user');
+const notificationService = require('./notification');
 
 module.exports.createQuestion = async ({ title, description, userId, tags }) => {
+    // Extract mentions from description
+    const mentions = notificationService.extractMentions(description);
+    
+    // Find mentioned users
+    const mentionedUsers = await userModel.find({
+        username: { $in: mentions }
+    }).select('_id username');
+
     const question = await questionModel.create({
         title,
         description,
         userId,
-        tags
+        tags,
+        mentions: mentionedUsers.map(user => user._id)
     });
+
+    // Create notifications for mentioned users
+    for (const mentionedUser of mentionedUsers) {
+        await notificationService.createNotification({
+            recipient: mentionedUser._id,
+            sender: userId,
+            type: 'mention_question',
+            content: `mentioned you in a question: "${title}"`,
+            questionId: question._id
+        });
+    }
+
     return question;
 };
 

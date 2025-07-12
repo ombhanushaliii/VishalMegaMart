@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator"
 import { ReportDialog } from "@/components/ui/report-dialog"
 import { HtmlRenderer } from "@/components/ui/html-renderer"
 import { QuillEditor } from "@/components/ui/quill-editor"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
+import { ShareComponent } from "@/components/ui/share-component"
 import { useAuth } from '@/context/AuthContext'
 
 interface User {
@@ -349,6 +351,12 @@ export default function QuestionDetailPage() {
                 <div className="flex items-center gap-1 text-[#7D8590]">
                   <span className="text-sm">{question.views} views</span>
                 </div>
+
+                <ShareComponent
+                  questionId={question._id}
+                  title={question.title}
+                  description={question.description}
+                />
               </div>
 
               <div className="flex items-center gap-3">
@@ -496,15 +504,16 @@ export default function QuestionDetailPage() {
                   </div>
                 )}
                 
-                <QuillEditor
-                  value={newAnswer}
-                  onChange={setNewAnswer}
-                  placeholder="Write your answer here... (minimum 10 characters)"
+                <RichTextEditor
+                  content={newAnswer}
+                  onUpdate={setNewAnswer}
+                  placeholder="Write your answer here... You can mention users with @username (minimum 10 characters)"
+                  className="min-h-[150px]"
                 />
                 
                 <div className="flex justify-between items-center">
                   <p className="text-xs text-[#7D8590]">
-                    {newAnswer.length}/5000 characters
+                    Use @ to mention users in your answer
                   </p>
                   
                   <Button

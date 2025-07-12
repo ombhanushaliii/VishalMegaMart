@@ -1,17 +1,55 @@
 const answerModel = require('../models/answer');
 const questionModel = require('../models/question');
+const userModel = require('../models/user');
+const notificationService = require('./notification');
 
 module.exports.createAnswer = async ({ questionId, userId, answer }) => {
+    // Extract mentions from answer
+    const mentions = notificationService.extractMentions(answer);
+    
+    // Find mentioned users
+    const mentionedUsers = await userModel.find({
+        username: { $in: mentions }
+    }).select('_id username');
+
     const newAnswer = await answerModel.create({
         questionId,
         userId,
-        answer
+        answer,
+        mentions: mentionedUsers.map(user => user._id)
     });
     
     // Populate the answer with user details
     const populatedAnswer = await answerModel
         .findById(newAnswer._id)
         .populate('userId', 'username email');
+    
+    // Get question details for notifications
+    const question = await questionModel.findById(questionId).populate('userId', 'username');
+    
+    // Create notifications for mentioned users in the answer
+    for (const mentionedUser of mentionedUsers) {
+        await notificationService.createNotification({
+            recipient: mentionedUser._id,
+            sender: userId,
+            type: 'mention_answer',
+            content: `mentioned you in an answer to: "${question.title}"`,
+            questionId: questionId,
+            answerId: newAnswer._id
+        });
+    }
+
+    // Create notification for question author (if not the same user)
+    if (question.userId._id.toString() !== userId.toString()) {
+        await notificationService.createNotification({
+            recipient: question.userId._id,
+            sender: userId,
+            type: 'answer_on_question',
+            content: `answered your question: "${question.title}"`,
+            questionId: questionId,
+            answerId: newAnswer._id
+        });
+    }
     
     return populatedAnswer;
 };

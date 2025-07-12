@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext"
 import { QuestionProvider } from "@/context/QuestionContext"
 import { ReportProvider } from "@/context/ReportContext"
 import { AnswerProvider } from "@/context/AnswerContext"
+import { NotificationProvider } from "@/context/NotificationContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,13 +24,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <QuestionProvider>
-            <AnswerProvider>
-              <ReportProvider>
-                {children}
-              </ReportProvider>
-            </AnswerProvider>
-          </QuestionProvider>
+          <NotificationProvider>
+            <QuestionProvider>
+              <AnswerProvider>
+                <ReportProvider>
+                  {children}
+                </ReportProvider>
+              </AnswerProvider>
+            </QuestionProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

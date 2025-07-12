@@ -1,165 +1,189 @@
 "use client"
 
-import { Bell, MessageSquare, ArrowUp, Heart, Award, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { useNotifications } from "@/context/NotificationContext"
+import { useAuth } from "@/context/AuthContext"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Bell, User, MessageSquare, CheckCircle, Loader2 } from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
+import { cn } from "@/lib/utils"
 
-const notifications = [
-  {
-    id: 1,
-    type: "answer",
-    icon: MessageSquare,
-    title: "New answer on your question",
-    description: "Sarah Johnson answered your question about Next.js SSR",
-    time: "2 minutes ago",
-    isRead: false,
-    avatar: "/placeholder.svg?height=40&width=40",
-    user: "Sarah Johnson",
-  },
-  {
-    id: 2,
-    type: "vote",
-    icon: ArrowUp,
-    title: "Your answer was upvoted",
-    description: "Your answer on 'TypeScript generics' received 5 upvotes",
-    time: "1 hour ago",
-    isRead: false,
-    avatar: null,
-    user: null,
-  },
-  {
-    id: 3,
-    type: "follow",
-    icon: Heart,
-    title: "New follower",
-    description: "Mike Rodriguez started following you",
-    time: "3 hours ago",
-    isRead: true,
-    avatar: "/placeholder.svg?height=40&width=40",
-    user: "Mike Rodriguez",
-  },
-  {
-    id: 4,
-    type: "badge",
-    icon: Award,
-    title: "Badge earned",
-    description: "You earned the 'Helpful Contributor' badge",
-    time: "1 day ago",
-    isRead: true,
-    avatar: null,
-    user: null,
-  },
-  {
-    id: 5,
-    type: "mention",
-    icon: Users,
-    title: "You were mentioned",
-    description: "Alex Chen mentioned you in a comment",
-    time: "2 days ago",
-    isRead: true,
-    avatar: "/placeholder.svg?height=40&width=40",
-    user: "Alex Chen",
-  },
-  {
-    id: 6,
-    type: "answer",
-    icon: MessageSquare,
-    title: "Question answered",
-    description: "Your question about CSS Grid received a new answer",
-    time: "3 days ago",
-    isRead: true,
-    avatar: "/placeholder.svg?height=40&width=40",
-    user: "Emma Wilson",
-  },
-]
+interface Notification {
+  _id: string
+  type: string
+  content: string
+  isRead: boolean
+  createdAt: string
+  questionId?: string
+  answerId?: string
+  sender?: {
+    _id: string
+    username: string
+  }
+}
 
 export function NotificationsPage() {
-  const unreadCount = notifications.filter((n) => !n.isRead).length
+  const { notifications, fetchNotifications, markAsRead, markAllAsRead, loading } = useNotifications()
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  const [localLoading, setLocalLoading] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications()
+    }
+  }, [isAuthenticated, fetchNotifications])
+
+  const handleNotificationClick = async (notification: Notification) => {
+    if (!notification.isRead) {
+      await markAsRead(notification._id)
+    }
+    
+    // Navigate to the question or answer
+    if (notification.questionId) {
+      router.push(`/questions/${notification.questionId}`)
+    }
+  }
+
+  const handleMarkAllAsRead = async () => {
+    setLocalLoading(true)
+    await markAllAsRead()
+    setLocalLoading(false)
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'mention_question':
+        return <MessageSquare className="h-4 w-4" />
+      case 'mention_answer':
+        return <MessageSquare className="h-4 w-4" />
+      case 'answer_on_question':
+        return <User className="h-4 w-4" />
+      default:
+        return <Bell className="h-4 w-4" />
+    }
+  }
+
+  const getNotificationMessage = (notification: Notification) => {
+    switch (notification.type) {
+      case 'mention_question':
+        return `${notification.sender?.username} mentioned you in a question`
+      case 'mention_answer':
+        return `${notification.sender?.username} mentioned you in an answer`
+      case 'answer_on_question':
+        return `${notification.sender?.username} answered your question`
+      default:
+        return notification.content
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <Bell className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-500">Please log in to view notifications</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Bell className="h-6 w-6 text-teal-400" />
+        <div>
           <h1 className="text-2xl font-bold text-[#C9D1D9]">Notifications</h1>
-          {unreadCount > 0 && <Badge className="bg-red-500/20 text-red-400 border-red-500/30">{unreadCount} new</Badge>}
+          <p className="text-[#7D8590] mt-1">
+            Stay updated with mentions and interactions
+          </p>
         </div>
-        <Button variant="ghost" size="sm" className="text-[#7D8590] hover:text-teal-400 transition-all duration-200">
-          Mark all as read
-        </Button>
+        {notifications.length > 0 && (
+          <Button 
+            onClick={handleMarkAllAsRead}
+            disabled={localLoading}
+            variant="outline"
+            className="bg-[#21262D] border-[#30363D] hover:bg-[#262C36] text-[#C9D1D9]"
+          >
+            {localLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <CheckCircle className="h-4 w-4 mr-2" />
+            )}
+            Mark all as read
+          </Button>
+        )}
       </div>
 
-      {/* Notifications List */}
-      <div className="space-y-3">
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className={`bg-[#161B22] rounded-xl border p-4 transition-all duration-300 cursor-pointer hover:border-[#30363D] hover:scale-[1.01] ${
-              !notification.isRead ? "border-teal-500/30 bg-teal-500/5" : "border-[#21262D]"
-            }`}
-          >
-            <div className="flex items-start space-x-4">
-              {/* Icon */}
-              <div
-                className={`p-2 rounded-lg flex-shrink-0 ${
-                  notification.type === "answer"
-                    ? "bg-blue-500/20 text-blue-400"
-                    : notification.type === "vote"
-                      ? "bg-green-500/20 text-green-400"
-                      : notification.type === "follow"
-                        ? "bg-pink-500/20 text-pink-400"
-                        : notification.type === "badge"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-purple-500/20 text-purple-400"
-                }`}
-              >
-                <notification.icon className="h-4 w-4" />
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
+      <div className="space-y-4">
+        {notifications.length === 0 ? (
+          <Card className="bg-[#161B22] border-[#21262D]">
+            <CardContent className="py-8 text-center">
+              <Bell className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-[#7D8590] text-lg">No notifications yet</p>
+              <p className="text-[#7D8590] text-sm mt-2">
+                You'll see notifications here when someone mentions you or interacts with your content
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          notifications.map((notification: Notification) => (
+            <Card
+              key={notification._id}
+              className={cn(
+                "cursor-pointer transition-all hover:bg-[#1C2128] bg-[#161B22] border-[#21262D]",
+                !notification.isRead && "border-l-4 border-l-blue-500"
+              )}
+              onClick={() => handleNotificationClick(notification)}
+            >
+              <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-[#C9D1D9] mb-1">{notification.title}</h3>
-                    <p className="text-sm text-[#7D8590] mb-2">{notification.description}</p>
-                    <div className="flex items-center space-x-3">
-                      {notification.user && (
-                        <div className="flex items-center space-x-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={notification.avatar || "/placeholder.svg"} />
-                            <AvatarFallback className="bg-[#21262D] text-[#C9D1D9] text-xs">
-                              {notification.user
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-xs text-[#7D8590]">{notification.user}</span>
-                        </div>
-                      )}
-                      <span className="text-xs text-[#7D8590]">{notification.time}</span>
+                  <div className="flex items-center space-x-3">
+                    <div className={cn(
+                      "p-2 rounded-full",
+                      notification.isRead ? "bg-[#21262D]" : "bg-blue-500/20"
+                    )}>
+                      {getNotificationIcon(notification.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "font-medium",
+                        notification.isRead ? "text-[#7D8590]" : "text-[#C9D1D9]"
+                      )}>
+                        {getNotificationMessage(notification)}
+                      </p>
+                      <p className="text-sm text-[#7D8590] mt-1">
+                        {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Unread indicator */}
-                  {!notification.isRead && <div className="w-2 h-2 bg-teal-400 rounded-full flex-shrink-0 mt-2"></div>}
+                  {!notification.isRead && (
+                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                      New
+                    </Badge>
+                  )}
                 </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Load More */}
-      <div className="flex justify-center pt-6">
-        <Button
-          variant="outline"
-          className="border-[#30363D] text-[#7D8590] hover:bg-[#161B22] hover:text-teal-400 bg-transparent transition-all duration-200 hover:scale-105"
-        >
-          Load More Notifications
-        </Button>
+              </CardHeader>
+              {notification.content && (
+                <CardContent className="pt-0">
+                  <p className="text-sm text-[#7D8590] bg-[#0D1117] p-3 rounded-lg border border-[#21262D]">
+                    {notification.content}
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+          ))
+        )}
       </div>
     </div>
   )

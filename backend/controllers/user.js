@@ -159,3 +159,38 @@ module.exports.completeOnboarding = async (req, res, next) => {
         res.status(500).json({ message: 'Server error' });
     }
 }
+
+module.exports.searchUsers = async (req, res) => {
+    try {
+        const { query } = req.query;
+        const limit = parseInt(req.query.limit) || 10;
+
+        if (!query || query.trim().length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Query must be at least 2 characters long'
+            });
+        }
+
+        const users = await userModel
+            .find({
+                $or: [
+                    { username: { $regex: query, $options: 'i' } },
+                    { email: { $regex: query, $options: 'i' } }
+                ]
+            })
+            .select('username email')
+            .limit(limit);
+
+        res.status(200).json({
+            success: true,
+            users
+        });
+    } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to search users' 
+        });
+    }
+};

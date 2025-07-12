@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowUp, ArrowDown, MessageSquare, Eye, MoreVertical } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ReportDialog } from "@/components/ui/report-dialog"
+import { ShareComponent } from "@/components/ui/share-component"
 import { useQuestions } from "@/context/QuestionContext"
 import { useAuth } from "@/context/AuthContext"
 
@@ -205,11 +206,28 @@ export function QuestionFeed(props?: QuestionFeedProps) {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-[#161B22] border-[#21262D]">
-                        <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer text-[#C9D1D9]">
-                          Share
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer text-[#C9D1D9]">
+                      <DropdownMenuContent 
+                        align="end" 
+                        className="bg-[#161B22] border-[#21262D]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ShareComponent
+                          questionId={question._id}
+                          title={question.title}
+                          description={question.description}
+                          trigger={
+                            <DropdownMenuItem 
+                              className="hover:bg-[#21262D] cursor-pointer text-[#C9D1D9]"
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              Share
+                            </DropdownMenuItem>
+                          }
+                        />
+                        <DropdownMenuItem 
+                          className="hover:bg-[#21262D] cursor-pointer text-[#C9D1D9]"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           Bookmark
                         </DropdownMenuItem>
                       </DropdownMenuContent>

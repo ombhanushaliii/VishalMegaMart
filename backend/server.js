@@ -8,6 +8,7 @@ const questionRoutes = require('./routes/question');
 const answerRoutes = require('./routes/answer');
 const reportRoutes = require('./routes/report');
 const adminRoutes = require('./routes/admin');
+const notificationRoutes = require('./routes/notification');
 
 const app = express();
 dotenv.config();
@@ -31,6 +32,7 @@ app.use('/api/v1/questions', questionRoutes);
 app.use('/api/v1/answers', answerRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

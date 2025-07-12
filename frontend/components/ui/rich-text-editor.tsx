@@ -6,6 +6,8 @@ import Placeholder from '@tiptap/extension-placeholder'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import Link from '@tiptap/extension-link'
 import { common, createLowlight } from 'lowlight'
+import { createMentionExtension } from './mention-extension'
+import { useNotifications } from '@/context/NotificationContext'
 import { Button } from './button'
 import { 
   Bold, 
@@ -39,6 +41,8 @@ export function RichTextEditor({
   className,
   minHeight = "200px"
 }: RichTextEditorProps) {
+  const { searchUsers } = useNotifications()
+  
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -57,6 +61,7 @@ export function RichTextEditor({
           class: 'text-teal-400 underline hover:text-teal-300',
         },
       }),
+      createMentionExtension(searchUsers),
     ],
     content,
     onUpdate: ({ editor }) => {

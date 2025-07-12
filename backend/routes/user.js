@@ -26,6 +26,8 @@ router.get('/logout', authMiddleware.authUser, userController.logoutUser)
 
 router.get('/check-username/:username', userController.checkUsername)
 
+router.get('/search', userController.searchUsers)
+
 router.put('/complete-onboarding', authMiddleware.authUser, [
     body('age').isInt({ min: 13, max: 120 }).withMessage('Age must be between 13 and 120'),
     body('occupation').notEmpty().withMessage('Occupation is required'),

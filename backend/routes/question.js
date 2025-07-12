@@ -32,6 +32,9 @@ router.get('/my-questions', authMiddleware.authUser, questionController.getUserQ
 // Get question by ID
 router.get('/:questionId', questionController.getQuestionById);
 
+// Share question
+router.get('/:questionId/share', questionController.shareQuestion);
+
 // Update question
 router.put('/:questionId', authMiddleware.authUser, [
     body('title')

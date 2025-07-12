@@ -38,6 +38,10 @@ const questionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }],
+    mentions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }],
     views: {
         type: Number,
         default: 0
