@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
-const API_BASE_URL = 'http://localhost:5000/api/v1'
+const API_BASE_URL = 'https://vishalmegamart.onrender.com/api/v1'
 
 // Helper function to safely access localStorage
 const safeLocalStorage = {
