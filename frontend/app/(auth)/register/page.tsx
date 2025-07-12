@@ -2,8 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export default function page() {
+  const { register, checkUsernameAvailability } = useAuth()
+  const router = useRouter()
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -13,17 +18,34 @@ export default function page() {
   const [showPassword, setShowPassword] = useState(false)
   const [isCheckingUsername, setIsCheckingUsername] = useState(false)
   const [usernameStatus, setUsernameStatus] = useState<'available' | 'taken' | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     })
+    setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Registration data:', formData)
+    setIsSubmitting(true)
+    setError('')
+    
+    try {
+      const result = await register(formData)
+      if (result.success) {
+        router.push('/onboarding')
+      } else {
+        setError(result.error || 'Registration failed')
+      }
+    } catch (error) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const togglePasswordVisibility = () => {
@@ -36,20 +58,18 @@ export default function page() {
       setIsCheckingUsername(true)
       setUsernameStatus(null)
 
-      // Simulate API call to check username availability
       const checkUsername = setTimeout(() => {
-        // Mock logic - you can replace this with actual API call
-        const isAvailable = Math.random() > 0.3 // 70% chance of being available
+        const isAvailable = checkUsernameAvailability(formData.username)
         setUsernameStatus(isAvailable ? 'available' : 'taken')
         setIsCheckingUsername(false)
-      }, 1000)
+      }, 500)
 
       return () => clearTimeout(checkUsername)
     } else {
       setIsCheckingUsername(false)
       setUsernameStatus(null)
     }
-  }, [formData.username])
+  }, [formData.username, checkUsernameAvailability])
 
   return (
     <div className="min-h-screen bg-black flex">
@@ -76,6 +96,13 @@ export default function page() {
               </Link>
             </p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -174,10 +201,10 @@ export default function page() {
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
-                className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                disabled={usernameStatus === 'taken' || isCheckingUsername}
+                className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={usernameStatus === 'taken' || isCheckingUsername || isSubmitting}
               >
-                Create account
+                {isSubmitting ? 'Creating account...' : 'Create account'}
               </button>
             </div>
           </form>
