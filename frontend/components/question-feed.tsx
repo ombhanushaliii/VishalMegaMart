@@ -177,18 +177,16 @@ export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
             <div className="px-4 py-3 border-b border-[#21262D]/50">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8 border border-[#30363D]">
-                  <AvatarImage src={question.author.avatar || "/placeholder.svg"} alt={question.author.name} />
+                  <AvatarImage src={question.author.avatar || "/placeholder.svg"} alt={question.author.username} />
                   <AvatarFallback className="bg-[#21262D] text-[#C9D1D9] text-sm font-medium">
-                    {question.author.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                    {question.author.username
+                      .substring(0, 2)
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-[#C9D1D9] text-sm truncate">{question.author.name}</span>
-                    <span className="text-[#7D8590] text-sm">@{question.author.username}</span>
+                    <span className="font-medium text-[#C9D1D9] text-sm truncate">@{question.author.username}</span>
                     <span className="text-[#7D8590] text-sm">·</span>
                     <span className="text-[#7D8590] text-sm">{question.timeAgo}</span>
                   </div>
