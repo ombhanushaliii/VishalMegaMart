@@ -133,51 +133,6 @@ export function TagsPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {!loading && tags.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-[#161B22] border-[#21262D]">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Tag className="h-8 w-8 text-teal-400" />
-                <div>
-                  <p className="text-2xl font-bold text-[#C9D1D9]">{tags.length}</p>
-                  <p className="text-sm text-[#7D8590]">Total Tags</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-[#161B22] border-[#21262D]">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Users className="h-8 w-8 text-blue-400" />
-                <div>
-                  <p className="text-2xl font-bold text-[#C9D1D9]">
-                    {tags.reduce((sum, tag) => sum + tag.questionCount, 0)}
-                  </p>
-                  <p className="text-sm text-[#7D8590]">Tagged Questions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-[#161B22] border-[#21262D]">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-green-400" />
-                <div>
-                  <p className="text-2xl font-bold text-[#C9D1D9]">
-                    {tags.length > 0 ? Math.round(tags.reduce((sum, tag) => sum + tag.questionCount, 0) / tags.length) : 0}
-                  </p>
-                  <p className="text-sm text-[#7D8590]">Avg Questions/Tag</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {/* Tags Content */}
       <Card className="bg-[#161B22] border-[#21262D]">
         <CardHeader>
