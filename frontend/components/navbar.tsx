@@ -104,9 +104,12 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-10 w-10 rounded-full"
+                className={cn(
+                  "relative h-10 w-10 rounded-full transition-all duration-300 hover:scale-110",
+                  currentView === "profile" && "ring-2 ring-teal-400 ring-offset-2 ring-offset-[#0D1117]",
+                )}
               >
-                <Avatar className="h-10 w-10 border-2 border-[#30363D] hover:border-teal-400">
+                <Avatar className="h-10 w-10 border-2 border-[#30363D] transition-all duration-300 hover:border-teal-400">
                   <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
                   <AvatarFallback className="bg-[#161B22] text-[#C9D1D9]">JD</AvatarFallback>
                 </Avatar>
@@ -116,14 +119,14 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
               className="w-56 bg-[#161B22] border-[#30363D] text-[#C9D1D9]"
               align="end"
             >
-              <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer">
+              <DropdownMenuItem
+                className={cn("hover:bg-[#21262D] cursor-pointer transition-colors duration-200")}
+                onClick={() => onViewChange("profile")}
+              >
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer">
-                Settings
-              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#30363D]" />
-              <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer text-red-400">
+              <DropdownMenuItem className="hover:bg-[#21262D] cursor-pointer text-red-400 transition-colors duration-200">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
