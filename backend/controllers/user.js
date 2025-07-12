@@ -2,6 +2,8 @@ const userModel = require('../models/user');
 const userService = require('../services/user');
 const { validationResult } = require('express-validator');
 const blackListTokenModel = require('../models/blackListToken');
+const questionModel = require('../models/question');
+const answerModel = require('../models/answer');
 
 module.exports.registerUser = async (req, res, next) => {
     const errors = validationResult(req);
@@ -194,3 +196,46 @@ module.exports.searchUsers = async (req, res) => {
         });
     }
 };
+
+module.exports.getUserStats = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        
+        // Get questions asked by user
+        const questionsAsked = await questionModel.countDocuments({ userId });
+        
+        // Get answers provided by user
+        const answersProvided = await answerModel.countDocuments({ userId });
+        
+        // Get total upvotes received on user's answers
+        const userAnswers = await answerModel.find({ userId });
+        const totalUpvotes = userAnswers.reduce((total, answer) => total + answer.upvotes.length, 0);
+        
+        // Get user's questions with their answers count
+        const userQuestions = await questionModel.find({ userId }).populate('userId', 'username');
+        
+        // Get user's recent answers with question details
+        const recentAnswers = await answerModel.find({ userId })
+            .populate('questionId', 'title')
+            .sort({ createdAt: -1 })
+            .limit(10);
+        
+        // Get user's recent questions
+        const recentQuestions = await questionModel.find({ userId })
+            .sort({ createdAt: -1 })
+            .limit(10);
+            
+        const stats = {
+            questionsAsked,
+            answersProvided,
+            totalUpvotes,
+            recentQuestions,
+            recentAnswers
+        };
+        
+        res.status(200).json({ success: true, stats });
+    } catch (error) {
+        console.error('Error fetching user stats:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
