@@ -4,29 +4,20 @@ import { useEffect, useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { RightSidebar } from "@/components/right-sidebar"
 import { MainContent } from "@/components/main-content"
-import { useAuth } from "@/context/AuthContext"
+import { ClientOnly } from "@/components/client-only"
 
 export type ContentView = "home" | "questions" | "tags" | "help" | "notifications" | "profile"
 
 export default function HomePage() {
-  const [currentView, setCurrentView] = useState<ContentView>("questions")
-  const [selectedLiveThread, setSelectedLiveThread] = useState<number | null>(null)
-  const { user, logout } = useAuth()
-
-  useEffect(() => {
-    if (user) {
-      setCurrentView("home")
-    } else {
-      setCurrentView("questions")
-    }
-  }, [user, logout])
+  const [currentView, setCurrentView] = useState<ContentView>("home")
+  const [selectedLiveThread, setSelectedLiveThread] = useState<string | null>(null)
 
   const handleViewChange = (view: ContentView) => {
     setCurrentView(view)
     setSelectedLiveThread(null)
   }
 
-  const handleLiveThreadSelect = (threadId: number) => {
+  const handleLiveThreadSelect = (threadId: string) => {
     setSelectedLiveThread(threadId)
     setCurrentView("home") 
   }
@@ -44,7 +35,9 @@ export default function HomePage() {
           />
         </main>
 
-        <RightSidebar onLiveThreadSelect={handleLiveThreadSelect} />
+        <ClientOnly>
+          <RightSidebar onLiveThreadSelect={handleLiveThreadSelect} />
+        </ClientOnly>
       </div>
     </div>
   )

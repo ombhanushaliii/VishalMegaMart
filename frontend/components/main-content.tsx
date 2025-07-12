@@ -10,8 +10,8 @@ import type { ContentView } from "@/app/page"
 
 interface MainContentProps {
   currentView: ContentView
-  selectedLiveThread: number | null
-  onLiveThreadSelect: (threadId: number) => void
+  selectedLiveThread: string | null
+  onLiveThreadSelect: (threadId: string) => void
 }
 
 export function MainContent({
@@ -21,7 +21,7 @@ export function MainContent({
 }: MainContentProps) {
   const renderContent = () => {
     if (selectedLiveThread) {
-      return <LiveThreadChat threadId={selectedLiveThread} onBack={() => onLiveThreadSelect(0)} />
+      return <LiveThreadChat threadId={selectedLiveThread} onBack={() => onLiveThreadSelect("")} />
     }
 
     switch (currentView) {
