@@ -6,6 +6,8 @@ import { QuestionProvider } from "@/context/QuestionContext"
 import { ReportProvider } from "@/context/ReportContext"
 import { AnswerProvider } from "@/context/AnswerContext"
 import { NotificationProvider } from "@/context/NotificationContext"
+import { LiveThreadProvider } from "@/context/LiveThreadContext"
+import { SocketProvider } from "@/context/SocketContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,15 +26,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <NotificationProvider>
-            <QuestionProvider>
-              <AnswerProvider>
-                <ReportProvider>
-                  {children}
-                </ReportProvider>
-              </AnswerProvider>
-            </QuestionProvider>
-          </NotificationProvider>
+          <SocketProvider>
+            <NotificationProvider>
+              <QuestionProvider>
+                <AnswerProvider>
+                  <ReportProvider>
+                    <LiveThreadProvider>
+                      {children}
+                    </LiveThreadProvider>
+                  </ReportProvider>
+                </AnswerProvider>
+              </QuestionProvider>
+            </NotificationProvider>
+          </SocketProvider>
         </AuthProvider>
       </body>
     </html>

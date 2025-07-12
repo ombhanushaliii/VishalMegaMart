@@ -49,6 +49,17 @@ const questionSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    // Indicates if this question was converted from a live thread
+    isFromLiveThread: {
+        type: Boolean,
+        default: false
+    },
+    // Reference to original live thread if converted
+    originalThreadId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LiveThread',
+        default: null
     }
 }, {
     timestamps: true
