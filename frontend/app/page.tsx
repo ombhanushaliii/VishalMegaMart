@@ -1,16 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { RightSidebar } from "@/components/right-sidebar"
 import { MainContent } from "@/components/main-content"
 import { ClientOnly } from "@/components/client-only"
+import { useAuth } from "@/context/AuthContext"
+import { set } from "date-fns"
 
 export type ContentView = "home" | "questions" | "tags" | "help" | "notifications" | "profile"
 
 export default function HomePage() {
-  const [currentView, setCurrentView] = useState<ContentView>("home")
+  const [currentView, setCurrentView] = useState<ContentView>("questions")
   const [selectedLiveThread, setSelectedLiveThread] = useState<string | null>(null)
+  const { user, logout, login } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      setCurrentView("home")
+    }
+
+  }, [user, login, logout])
 
   const handleViewChange = (view: ContentView) => {
     setCurrentView(view)
