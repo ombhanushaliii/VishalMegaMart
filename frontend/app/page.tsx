@@ -1,15 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { RightSidebar } from "@/components/right-sidebar"
 import { MainContent } from "@/components/main-content"
+import { useAuth } from "@/context/AuthContext"
 
 export type ContentView = "home" | "questions" | "tags" | "help" | "notifications" | "profile"
 
 export default function HomePage() {
-  const [currentView, setCurrentView] = useState<ContentView>("home")
+  const [currentView, setCurrentView] = useState<ContentView>("questions")
   const [selectedLiveThread, setSelectedLiveThread] = useState<number | null>(null)
+  const { user, logout } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      setCurrentView("home")
+    } else {
+      setCurrentView("questions")
+    }
+  }, [user, logout])
 
   const handleViewChange = (view: ContentView) => {
     setCurrentView(view)
@@ -18,7 +28,7 @@ export default function HomePage() {
 
   const handleLiveThreadSelect = (threadId: number) => {
     setSelectedLiveThread(threadId)
-    setCurrentView("home") // or create a separate "live-threads" view
+    setCurrentView("home") 
   }
 
   return (
