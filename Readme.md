@@ -4,7 +4,7 @@
 
 ### Video link: https://youtube.com
 
-#### Tech Stack
+### Tech Stack
 **Frontend:** Next JS
 
 **Backend:** Node JS
