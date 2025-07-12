@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 import type { ContentView } from "@/app/page"
@@ -62,10 +63,14 @@ export function Navbar({ currentView, onViewChange }: NavbarProps) {
     <nav className="sticky top-0 z-50 w-full border-b border-[#21262D] bg-[#0D1117]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0D1117]/75">
       <div className="flex h-16 items-center px-6">
         {/* Logo */}
-        <div className="flex items-center space-x-2 flex-shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">S</span>
-          </div>
+        <div className="flex items-center space-x-0 flex-shrink-0">
+          <Image
+            src="/logo.png"
+            alt="StackIt Logo"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-lg"
+          />
           <span className="font-bold text-xl text-[#C9D1D9]">StackIt</span>
         </div>
 
