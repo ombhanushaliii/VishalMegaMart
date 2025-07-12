@@ -96,7 +96,7 @@ module.exports.loginUser = async (req, res, next) => {
         res.status(500).json({ message: 'Server error' });
     }
 }
-//deploy
+//deploy last
 
 module.exports.getUserProfile = async (req, res, next) => {
     res.status(200).json(req.user);
