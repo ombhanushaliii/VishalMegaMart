@@ -1,22 +1,34 @@
-import type { Metadata } from 'next'
-import './globals.css'
-import { AuthProvider } from '@/context/AuthContext'
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { AuthProvider } from "@/context/AuthContext"
+import { QuestionProvider } from "@/context/QuestionContext"
+import { ReportProvider } from "@/context/ReportContext"
+import { AnswerProvider } from "@/context/AnswerContext"
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: 'StackIt',
-  description: 'Odoo Hackathon',
+  title: "STACKIt",
+  description: "A platform for developers to ask questions and share knowledge",
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
-      <body>
+      <body className={inter.className}>
         <AuthProvider>
-          {children}
+          <QuestionProvider>
+            <AnswerProvider>
+              <ReportProvider>
+                {children}
+              </ReportProvider>
+            </AnswerProvider>
+          </QuestionProvider>
         </AuthProvider>
       </body>
     </html>

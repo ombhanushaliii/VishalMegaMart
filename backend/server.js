@@ -4,6 +4,10 @@ const cookieParser = require('cookie-parser');
 const dotenv = require('@dotenvx/dotenvx');
 const connectToDb = require('./config/db');
 const userRoutes = require('./routes/user');
+const questionRoutes = require('./routes/question');
+const answerRoutes = require('./routes/answer');
+const reportRoutes = require('./routes/report');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 dotenv.config();
@@ -23,6 +27,10 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/questions', questionRoutes);
+app.use('/api/v1/answers', answerRoutes);
+app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

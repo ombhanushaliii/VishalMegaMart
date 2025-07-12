@@ -2,7 +2,6 @@
 
 import { AskQuestionForm } from "@/components/ask-question-form"
 import { QuestionFeed } from "@/components/question-feed"
-import { QuestionDetail } from "@/components/question-detail"
 import { NotificationsPage } from "@/components/notifications-page"
 import { LiveThreadChat } from "@/components/live-thread-chat"
 import { ProfilePage } from "@/components/profile-page"
@@ -10,26 +9,18 @@ import type { ContentView } from "@/app/page"
 
 interface MainContentProps {
   currentView: ContentView
-  selectedQuestion: number | null
   selectedLiveThread: number | null
-  onQuestionSelect: (questionId: number) => void
   onLiveThreadSelect: (threadId: number) => void
 }
 
 export function MainContent({
   currentView,
-  selectedQuestion,
   selectedLiveThread,
-  onQuestionSelect,
   onLiveThreadSelect,
 }: MainContentProps) {
   const renderContent = () => {
     if (selectedLiveThread) {
       return <LiveThreadChat threadId={selectedLiveThread} onBack={() => onLiveThreadSelect(0)} />
-    }
-
-    if (selectedQuestion) {
-      return <QuestionDetail questionId={selectedQuestion} onBack={() => onQuestionSelect(0)} />
     }
 
     switch (currentView) {
@@ -38,11 +29,11 @@ export function MainContent({
           <>
             <WelcomeSection />
             <AskQuestionForm />
-            <QuestionFeed onQuestionSelect={onQuestionSelect} />
+            <QuestionFeed />
           </>
         )
       case "questions":
-        return <QuestionFeed onQuestionSelect={onQuestionSelect} />
+        return <QuestionFeed />
       case "notifications":
         return <NotificationsPage />
       case "tags":
@@ -52,7 +43,7 @@ export function MainContent({
       case "profile":
         return <ProfilePage />
       default:
-        return <QuestionFeed onQuestionSelect={onQuestionSelect} />
+        return <QuestionFeed />
     }
   }
 

@@ -9,24 +9,15 @@ export type ContentView = "home" | "questions" | "tags" | "help" | "notification
 
 export default function HomePage() {
   const [currentView, setCurrentView] = useState<ContentView>("home")
-  const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null)
   const [selectedLiveThread, setSelectedLiveThread] = useState<number | null>(null)
 
   const handleViewChange = (view: ContentView) => {
     setCurrentView(view)
-    setSelectedQuestion(null)
     setSelectedLiveThread(null)
-  }
-
-  const handleQuestionSelect = (questionId: number) => {
-    setSelectedQuestion(questionId)
-    setSelectedLiveThread(null)
-    setCurrentView("questions")
   }
 
   const handleLiveThreadSelect = (threadId: number) => {
     setSelectedLiveThread(threadId)
-    setSelectedQuestion(null)
     setCurrentView("home") // or create a separate "live-threads" view
   }
 
@@ -38,9 +29,7 @@ export default function HomePage() {
         <main className="flex-1 2xl:mr-96 xl:mr-80 lg:mr-72 overflow-y-auto main-content">
           <MainContent
             currentView={currentView}
-            selectedQuestion={selectedQuestion}
             selectedLiveThread={selectedLiveThread}
-            onQuestionSelect={handleQuestionSelect}
             onLiveThreadSelect={handleLiveThreadSelect}
           />
         </main>

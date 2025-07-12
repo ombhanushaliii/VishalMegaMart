@@ -30,3 +30,23 @@ module.exports.authUser = async (req, res, next) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 }
+
+module.exports.authAdmin = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Check if it's a valid admin token (you may want to store these in database)
+    const validAdminTokens = ['admin_123456789']; // This should be stored securely
+    
+    if (!validAdminTokens.includes(token)) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Set admin flag for the request
+    req.isAdmin = true;
+    
+    return next();
+};

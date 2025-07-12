@@ -1,53 +1,28 @@
 "use client"
 
 import { useState } from "react"
-import {
-  Bold,
-  Italic,
-  Strikethrough,
-  List,
-  ListOrdered,
-  Link,
-  Smile,
-  ImageIcon,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-
-const formatButtons = [
-  { icon: Bold, label: "Bold" },
-  { icon: Italic, label: "Italic" },
-  { icon: Strikethrough, label: "Strikethrough" },
-  { icon: List, label: "Bullet List" },
-  { icon: ListOrdered, label: "Numbered List" },
-  { icon: Link, label: "Link" },
-  { icon: Smile, label: "Emoji" },
-  { icon: ImageIcon, label: "Image" },
-]
-
-const alignButtons = [
-  { icon: AlignLeft, label: "Align Left" },
-  { icon: AlignCenter, label: "Align Center" },
-  { icon: AlignRight, label: "Align Right" },
-]
+import { QuillEditor } from "@/components/ui/quill-editor"
+import { useQuestions } from "@/context/QuestionContext"
+import { useAuth } from "@/context/AuthContext"
 
 const popularTags = ["javascript", "react", "typescript", "nextjs", "css", "html", "nodejs", "python"]
 
 export function AskQuestionForm() {
+  const { createQuestion, loading } = useQuestions()
+  const { user } = useAuth()
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState("")
+  const [error, setError] = useState("")
 
   const addTag = (tag: string) => {
-    if (tag && !selectedTags.includes(tag) && selectedTags.length < 5) {
-      setSelectedTags([...selectedTags, tag])
+    const trimmedTag = tag.trim().toLowerCase()
+    if (trimmedTag && !selectedTags.includes(trimmedTag) && selectedTags.length < 5) {
+      setSelectedTags([...selectedTags, trimmedTag])
       setTagInput("")
     }
   }
@@ -56,135 +31,161 @@ export function AskQuestionForm() {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove))
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+
+    if (!user) {
+      setError("Please log in to ask a question")
+      return
+    }
+
+    if (title.length < 5) {
+      setError("Title must be at least 5 characters long")
+      return
+    }
+
+    if (content.length < 10) {
+      setError("Description must be at least 10 characters long")
+      return
+    }
+
+    if (selectedTags.length === 0) {
+      setError("Please add at least one tag")
+      return
+    }
+
+    const result = await createQuestion({
+      title,
+      description: content,
+      tags: selectedTags,
+    })
+
+    if (result.success) {
+      // Reset form
+      setTitle("")
+      setContent("")
+      setSelectedTags([])
+      setTagInput("")
+      setError("")
+    } else {
+      setError(result.error || "Failed to create question")
+    }
+  }
+
   return (
-    <div className="bg-[#161B22] rounded-xl border border-[#21262D] p-6 shadow-lg">
+    <div className="bg-[#161B22] rounded-xl border border-[#21262D] p-6 shadow-lg mb-6">
       <h2 className="text-xl font-semibold text-[#C9D1D9] mb-6">Ask a Question</h2>
 
-      {/* Title Input */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Question Title</label>
-        <Input
-          placeholder="What's your programming question?"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="bg-[#0D1117] border-[#30363D] text-[#C9D1D9] placeholder:text-[#7D8590] focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
-        />
-      </div>
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
 
-      {/* Rich Text Editor */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Question Details</label>
+      <form onSubmit={handleSubmit}>
+        {/* Title Input */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Question Title</label>
+          <Input
+            placeholder="What's your programming question?"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="bg-[#0D1117] border-[#30363D] text-[#C9D1D9] placeholder:text-[#7D8590] focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
+            maxLength={200}
+          />
+          <p className="text-xs text-[#7D8590] mt-1">
+            {title.length}/200 characters
+          </p>
+        </div>
 
-        {/* Toolbar */}
-        <div className="bg-[#0D1117] border border-[#30363D] rounded-t-lg p-3">
-          <div className="flex flex-wrap items-center gap-1">
-            {formatButtons.map((button) => (
-              <Button
-                key={button.label}
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D]"
-                title={button.label}
-              >
-                <button.icon className="h-4 w-4" />
-              </Button>
-            ))}
+        {/* Rich Text Editor */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Question Details</label>
+          <QuillEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Describe your question in detail. Include what you've tried and what specific help you need..."
+          />
+          <p className="text-xs text-[#7D8590] mt-1">
+            {content.length}/5000 characters
+          </p>
+        </div>
 
-            <Separator orientation="vertical" className="h-6 bg-[#30363D] mx-2" />
+        {/* Tags Section */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Tags (up to 5)</label>
 
-            {alignButtons.map((button) => (
-              <Button
-                key={button.label}
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D]"
-                title={button.label}
-              >
-                <button.icon className="h-4 w-4" />
-              </Button>
-            ))}
+          {/* Selected Tags */}
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {selectedTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:bg-teal-500/30 cursor-pointer px-2.5 py-0.5 text-xs font-semibold rounded transition-colors"
+                  onClick={() => removeTag(tag)}
+                >
+                  {tag} ×
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Tag Input */}
+          <div className="flex gap-2 mb-3">
+            <Input
+              placeholder="Add tags..."
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  addTag(tagInput)
+                }
+              }}
+              className="bg-[#0D1117] border-[#30363D] text-[#C9D1D9] placeholder:text-[#7D8590] focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
+              disabled={selectedTags.length >= 5}
+            />
+            <Button
+              type="button"
+              onClick={() => addTag(tagInput)}
+              disabled={!tagInput || selectedTags.length >= 5}
+              className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:bg-teal-500/30"
+            >
+              Add
+            </Button>
+          </div>
+
+          {/* Popular Tags */}
+          <div>
+            <p className="text-xs text-[#7D8590] mb-2">Popular tags:</p>
+            <div className="flex flex-wrap gap-2">
+              {popularTags
+                .filter((tag) => !selectedTags.includes(tag))
+                .map((tag) => (
+                  <span
+                    key={tag}
+                    className="border border-[#30363D] text-[#7D8590] hover:border-teal-500/30 hover:text-teal-400 cursor-pointer transition-colors px-2.5 py-0.5 text-xs rounded"
+                    onClick={() => selectedTags.length < 5 && addTag(tag)}
+                  >
+                    {tag}
+                  </span>
+                ))}
+            </div>
           </div>
         </div>
 
-        {/* Text Area */}
-        <Textarea
-          placeholder="Describe your question in detail. Include what you've tried and what specific help you need..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="min-h-32 bg-[#0D1117] border-[#30363D] border-t-0 rounded-t-none text-[#C9D1D9] placeholder:text-[#7D8590] focus:border-teal-400 focus:ring-1 focus:ring-teal-400 resize-none"
-        />
-      </div>
-
-      {/* Tags Section */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-[#C9D1D9] mb-2">Tags (up to 5)</label>
-
-        {/* Selected Tags */}
-        {selectedTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {selectedTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:bg-teal-500/30 cursor-pointer"
-                onClick={() => removeTag(tag)}
-              >
-                {tag} ×
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Tag Input */}
-        <div className="flex gap-2 mb-3">
-          <Input
-            placeholder="Add tags..."
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                addTag(tagInput.toLowerCase())
-              }
-            }}
-            className="bg-[#0D1117] border-[#30363D] text-[#C9D1D9] placeholder:text-[#7D8590] focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
-          />
+        {/* Submit Button */}
+        <div className="flex justify-end">
           <Button
-            onClick={() => addTag(tagInput.toLowerCase())}
-            disabled={!tagInput || selectedTags.length >= 5}
-            className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:bg-teal-500/30"
+            type="submit"
+            disabled={loading || !title || !content || selectedTags.length === 0}
+            className="bg-teal-500 text-white hover:bg-teal-600 disabled:opacity-50"
           >
-            Add
+            {loading ? "Posting..." : "Post Question"}
           </Button>
         </div>
-
-        {/* Popular Tags */}
-        <div>
-          <p className="text-xs text-[#7D8590] mb-2">Popular tags:</p>
-          <div className="flex flex-wrap gap-2">
-            {popularTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="border-[#30363D] text-[#7D8590] hover:border-teal-500/30 hover:text-teal-400 cursor-pointer transition-colors"
-                onClick={() => addTag(tag)}
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Submit Button */}
-      <div className="flex justify-end">
-        <Button
-          className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-full px-8 py-2 font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
-          disabled={!title.trim() || !content.trim()}
-        >
-          Post Question
-        </Button>
-      </div>
+      </form>
     </div>
   )
 }
