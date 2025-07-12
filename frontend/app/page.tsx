@@ -4,9 +4,8 @@ import { useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { RightSidebar } from "@/components/right-sidebar"
 import { MainContent } from "@/components/main-content"
-import { Footer } from "@/components/footer"
 
-export type ContentView = "home" | "questions" | "most-answered" | "unanswered" | "tags" | "help" | "notifications"
+export type ContentView = "home" | "questions" | "tags" | "help" | "notifications"
 
 export default function HomePage() {
   const [currentView, setCurrentView] = useState<ContentView>("home")
@@ -36,7 +35,7 @@ export default function HomePage() {
       <Navbar currentView={currentView} onViewChange={handleViewChange} />
 
       <div className="flex flex-1 h-[calc(100vh-4rem)]">
-        <main className="flex-1 2xl:mr-96 xl:mr-80 lg:mr-72 overflow-y-auto">
+        <main className="flex-1 2xl:mr-96 xl:mr-80 lg:mr-72 overflow-y-auto main-content">
           <MainContent
             currentView={currentView}
             selectedQuestion={selectedQuestion}
@@ -44,7 +43,6 @@ export default function HomePage() {
             onQuestionSelect={handleQuestionSelect}
             onLiveThreadSelect={handleLiveThreadSelect}
           />
-          <Footer />
         </main>
 
         <RightSidebar onLiveThreadSelect={handleLiveThreadSelect} />

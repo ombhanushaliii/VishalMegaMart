@@ -42,10 +42,6 @@ export function MainContent({
         )
       case "questions":
         return <QuestionFeed onQuestionSelect={onQuestionSelect} />
-      case "most-answered":
-        return <QuestionFeed filter="most-answered" onQuestionSelect={onQuestionSelect} />
-      case "unanswered":
-        return <QuestionFeed filter="unanswered" onQuestionSelect={onQuestionSelect} />
       case "notifications":
         return <NotificationsPage />
       case "tags":

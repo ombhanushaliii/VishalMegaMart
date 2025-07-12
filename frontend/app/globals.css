@@ -69,22 +69,36 @@
   }
 }
 
-/* Custom scrollbar for dark theme */
-::-webkit-scrollbar {
+/* Custom scrollbar for main content and sidebar only */
+.main-content::-webkit-scrollbar,
+.live-threads-sidebar::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
+.main-content::-webkit-scrollbar-track,
+.live-threads-sidebar::-webkit-scrollbar-track {
   background: #0d1117;
 }
 
-::-webkit-scrollbar-thumb {
+.main-content::-webkit-scrollbar-thumb,
+.live-threads-sidebar::-webkit-scrollbar-thumb {
   background: #30363d;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.main-content::-webkit-scrollbar-thumb:hover,
+.live-threads-sidebar::-webkit-scrollbar-thumb:hover {
   background: #484f58;
+}
+
+/* Hide scrollbar for all other elements */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 /* Smooth transitions for all interactive elements */

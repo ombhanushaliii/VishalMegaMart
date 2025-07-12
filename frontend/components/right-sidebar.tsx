@@ -97,16 +97,16 @@ export function RightSidebar({ onLiveThreadSelect }: RightSidebarProps) {
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-full live-threads-sidebar">
             <div className="p-6 space-y-4">
               {liveThreads.map((thread) => (
                 <div
                   key={thread.id}
                   onClick={() => onLiveThreadSelect(thread.id)}
-                  className="p-5 rounded-xl bg-[#161B22] border border-[#21262D] hover:border-[#30363D] transition-all duration-300 cursor-pointer group hover:shadow-lg hover:scale-[1.02]"
+                  className="p-5 rounded-xl bg-[#161B22] border border-[#21262D] hover:border-[#30363D] cursor-pointer group"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <h3 className="font-medium text-[#C9D1D9] text-sm leading-tight group-hover:text-teal-400 transition-colors duration-300 line-clamp-2">
+                    <h3 className="font-medium text-[#C9D1D9] text-sm leading-tight group-hover:text-teal-400 line-clamp-2">
                       {thread.title}
                     </h3>
                     <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs ml-3 flex-shrink-0 animate-pulse">
@@ -133,7 +133,7 @@ export function RightSidebar({ onLiveThreadSelect }: RightSidebarProps) {
 
                     <Button
                       size="sm"
-                      className="h-7 px-4 text-xs bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:bg-teal-500/30 rounded-full transition-all duration-300 hover:scale-105"
+                      className="h-7 px-4 text-xs bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:bg-teal-500/30 rounded-full"
                     >
                       Join
                     </Button>

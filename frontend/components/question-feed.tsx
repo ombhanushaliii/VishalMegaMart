@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { MessageSquare, ArrowUp, ArrowDown, Share, Bookmark, MoreHorizontal, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -7,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface QuestionFeedProps {
-  filter?: "recent" | "most-answered" | "unanswered" | "most-viewed"
   onQuestionSelect?: (questionId: number) => void
 }
 
@@ -99,9 +99,11 @@ const questions = [
   },
 ]
 
-export function QuestionFeed({ filter = "recent", onQuestionSelect }: QuestionFeedProps) {
+export function QuestionFeed({ onQuestionSelect }: QuestionFeedProps) {
+  const [activeFilter, setActiveFilter] = useState<"recent" | "most-answered" | "unanswered">("recent")
+
   const getFilteredQuestions = () => {
-    switch (filter) {
+    switch (activeFilter) {
       case "most-answered":
         return [...questions].sort((a, b) => b.stats.answers - a.stats.answers)
       case "unanswered":
@@ -118,9 +120,9 @@ export function QuestionFeed({ filter = "recent", onQuestionSelect }: QuestionFe
       {/* Filter Tabs */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-[#C9D1D9]">
-          {filter === "most-answered"
+          {activeFilter === "most-answered"
             ? "Most Answered Questions"
-            : filter === "unanswered"
+            : activeFilter === "unanswered"
               ? "Unanswered Questions"
               : "Recent Questions"}
         </h2>
@@ -128,10 +130,11 @@ export function QuestionFeed({ filter = "recent", onQuestionSelect }: QuestionFe
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setActiveFilter("recent")}
             className={
-              filter === "recent"
+              activeFilter === "recent"
                 ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-md"
-                : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md transition-all duration-200"
+                : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md"
             }
           >
             Recent
@@ -139,10 +142,11 @@ export function QuestionFeed({ filter = "recent", onQuestionSelect }: QuestionFe
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setActiveFilter("most-answered")}
             className={
-              filter === "most-answered"
+              activeFilter === "most-answered"
                 ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-md"
-                : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md transition-all duration-200"
+                : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md"
             }
           >
             Most Answered
@@ -150,10 +154,11 @@ export function QuestionFeed({ filter = "recent", onQuestionSelect }: QuestionFe
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setActiveFilter("unanswered")}
             className={
-              filter === "unanswered"
+              activeFilter === "unanswered"
                 ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded-md"
-                : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md transition-all duration-200"
+                : "text-[#7D8590] hover:text-[#C9D1D9] hover:bg-[#21262D] rounded-md"
             }
           >
             Unanswered
